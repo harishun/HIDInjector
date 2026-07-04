@@ -1,0 +1,688 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_slate">
+
+    <!-- Top Action Bar -->
+    <RelativeLayout
+        android:id="@+id/action_bar"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#0C0C54"
+        android:paddingHorizontal="16dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="HID Control Center"
+            android:textColor="@color/text_primary"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true">
+
+            <ImageView
+                android:id="@+id/btn_theme"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_theme"
+                android:layout_marginEnd="20dp"
+                android:contentDescription="Toggle Theme" />
+
+            <ImageView
+                android:id="@+id/btn_refresh_bar"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_refresh"
+                android:contentDescription="Refresh Link" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <!-- Connection / Status Selector Header -->
+    <LinearLayout
+        android:id="@+id/connection_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@id/action_bar"
+        android:background="#12121A"
+        android:padding="16dp"
+        android:gravity="center_vertical">
+
+        <Spinner
+            android:id="@+id/spinner_devices"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:background="@drawable/spinner_background"
+            android:paddingHorizontal="12dp"
+            android:spinnerMode="dropdown" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginStart="12dp"
+            android:background="@drawable/edit_text_background"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:gravity="center_vertical">
+
+            <View
+                android:id="@+id/view_status_dot"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:background="@color/status_red"
+                android:layout_marginEnd="6dp" />
+
+            <TextView
+                android:id="@+id/tv_status_on"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="OFF"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Main Content Frame -->
+    <FrameLayout
+        android:id="@+id/content_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/connection_header"
+        android:layout_above="@+id/bottom_navigation"
+        android:padding="16dp">
+
+        <!-- 1. Shortcuts Screen -->
+        <RelativeLayout
+            android:id="@+id/screen_shortcuts"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_shortcuts"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="16dp" />
+        </RelativeLayout>
+
+        <!-- 2. Input Screen -->
+        <LinearLayout
+            android:id="@+id/screen_input"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <!-- Trackpad Area -->
+            <FrameLayout
+                android:id="@+id/trackpad_area"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@drawable/card_background"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_gravity="center"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/ic_trackpad"
+                        android:layout_marginBottom="12dp"
+                        android:contentDescription="Trackpad" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Trackpad"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="16sp" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- Mouse Buttons -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <Button
+                    android:id="@+id/btn_mouse_left"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:text="Left"
+                    android:textColor="@color/text_primary"
+                    android:background="@drawable/card_background"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btn_mouse_middle"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:text="Middle"
+                    android:textColor="@color/text_primary"
+                    android:background="@drawable/card_background"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btn_mouse_right"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="match_parent"
+                    android:text="Right"
+                    android:textColor="@color/text_primary"
+                    android:background="@drawable/card_background" />
+            </LinearLayout>
+
+            <!-- Real-time Keyboard input -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/edit_text_background"
+                android:paddingHorizontal="16dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_keyboard"
+                    android:contentDescription="Keyboard" />
+
+                <EditText
+                    android:id="@+id/et_realtime_keyboard"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="Type keys (real-time)..."
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_hint"
+                    android:background="@null"
+                    android:layout_marginStart="12dp"
+                    android:inputType="textNoSuggestions" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- 3. Scripting Screen -->
+        <RelativeLayout
+            android:id="@+id/screen_scripting"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <!-- Actions Row Top -->
+            <LinearLayout
+                android:id="@+id/script_top_actions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="12dp">
+
+                <Button
+                    android:id="@+id/btn_script_library"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="48dp"
+                    android:text="Library"
+                    android:drawableStart="@drawable/ic_library"
+                    android:textColor="@color/text_primary"
+                    android:background="@drawable/button_secondary"
+                    android:paddingHorizontal="16dp"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btn_script_save"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="48dp"
+                    android:text="Save"
+                    android:drawableStart="@drawable/ic_save"
+                    android:textColor="@color/text_primary"
+                    android:background="@drawable/button_secondary"
+                    android:paddingHorizontal="16dp" />
+            </LinearLayout>
+
+            <!-- Editor -->
+            <EditText
+                android:id="@+id/et_ducky_script"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@id/script_top_actions"
+                android:layout_above="@+id/btn_execute_script"
+                android:layout_marginBottom="12dp"
+                android:hint="Ducky Script"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/text_hint"
+                android:gravity="top|start"
+                android:background="@drawable/edit_text_background"
+                android:padding="16dp"
+                android:inputType="textMultiLine"
+                android:scrollbars="vertical" />
+
+            <!-- Execute Script Button -->
+            <Button
+                android:id="@+id/btn_execute_script"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_above="@+id/tv_script_status"
+                android:text="EXECUTE SCRIPT"
+                android:drawableStart="@drawable/ic_shortcuts"
+                android:textColor="@color/text_primary"
+                android:background="@drawable/button_primary"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/tv_script_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:text="Status: Ready"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp" />
+        </RelativeLayout>
+
+        <!-- 4. Settings Screen -->
+        <ScrollView
+            android:id="@+id/screen_settings"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Profile & Target Group -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PROFILE &amp; TARGET"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp"
+                    android:letterSpacing="0.1" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="24dp"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Target OS"
+                            android:textColor="@color/text_primary"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Adjusts gestures and Unicode strategies"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <Spinner
+                        android:id="@+id/spinner_settings_os"
+                        android:layout_width="140dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/edit_text_background" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#1F2937"
+                    android:layout_marginBottom="20dp" />
+
+                <!-- Mouse & Trackpad Group -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="MOUSE &amp; TRACKPAD"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp"
+                    android:letterSpacing="0.1" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="24dp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Sensitivity"
+                            android:textColor="@color/text_primary"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:id="@+id/tv_sensitivity_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:text="3.0"
+                            android:textColor="@color/text_primary"
+                            android:textSize="14sp" />
+                    </RelativeLayout>
+
+                    <SeekBar
+                        android:id="@+id/seekbar_sensitivity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="50"
+                        android:progress="30" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#1F2937"
+                    android:layout_marginBottom="20dp" />
+
+                <!-- Keyboard Group -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="KEYBOARD"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp"
+                    android:letterSpacing="0.1" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="24dp"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Layout"
+                            android:textColor="@color/text_primary"
+                            android:textSize="16sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Multi-language mapping supported"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <Spinner
+                        android:id="@+id/spinner_settings_layout"
+                        android:layout_width="160dp"
+                        android:layout_height="48dp"
+                        android:background="@drawable/edit_text_background" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#1F2937"
+                    android:layout_marginBottom="20dp" />
+
+                <!-- Bluetooth Visibility Group -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="BLUETOOTH VISIBILITY"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp"
+                    android:letterSpacing="0.1" />
+
+                <Button
+                    android:id="@+id/btn_settings_discoverable"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="Make Discoverable"
+                    android:textColor="@color/text_primary"
+                    android:background="@drawable/button_secondary"
+                    android:layout_marginBottom="24dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="#1F2937"
+                    android:layout_marginBottom="20dp" />
+
+                <!-- About Group -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="ABOUT"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp"
+                    android:letterSpacing="0.1" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Version"
+                        android:textColor="@color/text_primary"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:text="1.2.0 PRO (Unicode 17.0)"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="14sp" />
+                </RelativeLayout>
+
+                <Button
+                    android:id="@+id/btn_settings_help"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="User Guide &amp; Reference"
+                    android:textColor="@color/text_primary"
+                    android:background="@drawable/button_secondary" />
+            </LinearLayout>
+        </ScrollView>
+    </FrameLayout>
+
+    <!-- Bottom Navigation Bar -->
+    <LinearLayout
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:background="#12121A"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingVertical="8dp">
+        <!-- Shortcuts Tab -->
+        <LinearLayout
+            android:id="@+id/nav_shortcuts"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <FrameLayout
+                android:id="@+id/container_shortcuts_pill"
+                android:layout_width="64dp"
+                android:layout_height="32dp"
+                android:layout_marginBottom="4dp">
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_shortcuts"
+                    android:layout_gravity="center"
+                    android:contentDescription="Shortcuts" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tv_nav_shortcuts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Shortcuts"
+                android:textColor="@color/text_primary"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Input Tab -->
+        <LinearLayout
+            android:id="@+id/nav_input"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <FrameLayout
+                android:id="@+id/container_input_pill"
+                android:layout_width="64dp"
+                android:layout_height="32dp"
+                android:layout_marginBottom="4dp">
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_input"
+                    android:layout_gravity="center"
+                    android:contentDescription="Input" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tv_nav_input"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Input"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Scripting Tab -->
+        <LinearLayout
+            android:id="@+id/nav_scripting"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <FrameLayout
+                android:id="@+id/container_scripting_pill"
+                android:layout_width="64dp"
+                android:layout_height="32dp"
+                android:layout_marginBottom="4dp">
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_scripting"
+                    android:layout_gravity="center"
+                    android:contentDescription="Scripting" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tv_nav_scripting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Scripting"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Settings Tab -->
+        <LinearLayout
+            android:id="@+id/nav_settings"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:clickable="true"
+            android:focusable="true">
+
+            <FrameLayout
+                android:id="@+id/container_settings_pill"
+                android:layout_width="64dp"
+                android:layout_height="32dp"
+                android:layout_marginBottom="4dp">
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_settings"
+                    android:layout_gravity="center"
+                    android:contentDescription="Settings" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tv_nav_settings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Settings"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

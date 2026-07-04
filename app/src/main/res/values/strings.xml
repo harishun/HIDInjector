@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">HID Injector</string>
+
+    <string-array name="target_os_array">
+        <item>Windows</item>
+        <item>macOS</item>
+        <item>Linux</item>
+    </string-array>
+
+    <string-array name="keyboard_layouts_array">
+        <item>US (QWERTY)</item>
+        <item>UK (QWERTY)</item>
+        <item>French (AZERTY)</item>
+        <item>German (QWERTZ)</item>
+    </string-array>
+</resources>
