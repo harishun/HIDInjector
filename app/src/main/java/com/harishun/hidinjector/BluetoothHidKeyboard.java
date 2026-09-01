@@ -79,10 +79,11 @@ public class BluetoothHidKeyboard {
             (byte) 0x05, 0x01,       //     USAGE_PAGE (Generic Desktop)
             (byte) 0x09, 0x30,       //     USAGE (X)
             (byte) 0x09, 0x31,       //     USAGE (Y)
+            (byte) 0x09, 0x38,       //     USAGE (Wheel)
             (byte) 0x15, (byte) 0x81,//     LOGICAL_MINIMUM (-127)
             (byte) 0x25, 0x7f,       //     LOGICAL_MAXIMUM (127)
             (byte) 0x75, 0x08,       //     REPORT_SIZE (8)
-            (byte) 0x95, 0x02,       //     REPORT_COUNT (2)
+            (byte) 0x95, 0x03,       //     REPORT_COUNT (3)
             (byte) 0x81, 0x06,       //     INPUT (Data,Var,Rel)
             (byte) 0xc0,             //   END_COLLECTION
             (byte) 0xc0              // END_COLLECTION
@@ -340,16 +341,21 @@ public class BluetoothHidKeyboard {
     }
 
     @SuppressLint("MissingPermission")
-    public void transmitMouseReport(byte buttons, byte x, byte y) {
+    public void transmitMouseReport(byte buttons, byte x, byte y, byte wheel) {
         BluetoothDevice target = getConnectedDevice();
         if (hidDeviceService == null || target == null) return;
 
-        byte[] report = new byte[3];
+        byte[] report = new byte[4];
         report[0] = buttons;
         report[1] = x;
         report[2] = y;
+        report[3] = wheel;
 
         hidDeviceService.sendReport(target, 2, report);
+    }
+
+    public void transmitMouseReport(byte buttons, byte x, byte y) {
+        transmitMouseReport(buttons, x, y, (byte) 0);
     }
 
     @SuppressLint("MissingPermission")

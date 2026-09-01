@@ -17,6 +17,9 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -32,6 +35,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -61,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements
     private LinearLayout navShortcuts, navInput, navScripting, navSettings;
     private FrameLayout pillShortcuts, pillInput, pillScripting, pillSettings;
     private TextView tvNavShortcuts, tvNavInput, tvNavScripting, tvNavSettings;
+    private ImageView ivNavShortcuts, ivNavInput, ivNavScripting, ivNavSettings;
 
     private Spinner spinnerDevices;
     private View viewStatusDot;
@@ -70,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements
     private List<ShortcutItem> shortcutsList = new ArrayList<>();
     private ItemTouchHelper itemTouchHelper;
     private long lastToastTime = 0;
+    private int currentSelectedTab = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +84,10 @@ public class MainActivity extends AppCompatActivity implements
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+
+        if (savedInstanceState != null) {
+            currentSelectedTab = savedInstanceState.getInt("saved_tab_index", 0);
         }
 
         super.onCreate(savedInstanceState);
@@ -98,19 +108,23 @@ public class MainActivity extends AppCompatActivity implements
         handleShortcutIntent(getIntent());
     }
 
-    private void bindViews() {
-        findViewById(R.id.btn_theme).setOnClickListener(v -> {
-            boolean isNight = !settingsManager.isNightMode();
-            settingsManager.setNightMode(isNight);
-            if (isNight) {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-            } else {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-            }
-            recreate();
-        });
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("saved_tab_index", currentSelectedTab);
+    }
 
-        findViewById(R.id.btn_refresh_bar).setOnClickListener(v -> refreshAllSystems());
+    private void bindViews() {
+        ImageView btnTheme = findViewById(R.id.btn_theme);
+        if (btnTheme != null) {
+            btnTheme.setImageResource(settingsManager.isNightMode() ? R.drawable.ic_theme : R.drawable.ic_moon);
+            btnTheme.setOnClickListener(v -> toggleTheme());
+        }
+
+        View refreshBtn = findViewById(R.id.btn_refresh_bar);
+        if (refreshBtn != null) {
+            refreshBtn.setOnClickListener(v -> refreshAllSystems());
+        }
 
         spinnerDevices = findViewById(R.id.spinner_devices);
         viewStatusDot = findViewById(R.id.view_status_dot);
@@ -135,6 +149,22 @@ public class MainActivity extends AppCompatActivity implements
         tvNavInput = findViewById(R.id.tv_nav_input);
         tvNavScripting = findViewById(R.id.tv_nav_scripting);
         tvNavSettings = findViewById(R.id.tv_nav_settings);
+
+        ivNavShortcuts = findViewById(R.id.iv_nav_shortcuts);
+        ivNavInput = findViewById(R.id.iv_nav_input);
+        ivNavScripting = findViewById(R.id.iv_nav_scripting);
+        ivNavSettings = findViewById(R.id.iv_nav_settings);
+    }
+
+    private void toggleTheme() {
+        boolean isNight = !settingsManager.isNightMode();
+        settingsManager.setNightMode(isNight);
+        if (isNight) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+        recreate();
     }
 
     private void setupNavigation() {
@@ -142,10 +172,11 @@ public class MainActivity extends AppCompatActivity implements
         navInput.setOnClickListener(v -> selectTab(1));
         navScripting.setOnClickListener(v -> selectTab(2));
         navSettings.setOnClickListener(v -> selectTab(3));
-        selectTab(0);
+        selectTab(currentSelectedTab);
     }
 
     private void selectTab(int index) {
+        currentSelectedTab = index;
         screenShortcuts.setVisibility(index == 0 ? View.VISIBLE : View.GONE);
         screenInput.setVisibility(index == 1 ? View.VISIBLE : View.GONE);
         screenScripting.setVisibility(index == 2 ? View.VISIBLE : View.GONE);
@@ -163,6 +194,11 @@ public class MainActivity extends AppCompatActivity implements
         tvNavInput.setTextColor(index == 1 ? primaryColor : secondaryColor);
         tvNavScripting.setTextColor(index == 2 ? primaryColor : secondaryColor);
         tvNavSettings.setTextColor(index == 3 ? primaryColor : secondaryColor);
+
+        if (ivNavShortcuts != null) ivNavShortcuts.setColorFilter(index == 0 ? primaryColor : secondaryColor);
+        if (ivNavInput != null) ivNavInput.setColorFilter(index == 1 ? primaryColor : secondaryColor);
+        if (ivNavScripting != null) ivNavScripting.setColorFilter(index == 2 ? primaryColor : secondaryColor);
+        if (ivNavSettings != null) ivNavSettings.setColorFilter(index == 3 ? primaryColor : secondaryColor);
 
         if (index == 1 && mouseController == null) setupInputScreenComponents();
         if (index == 2) setupScriptingScreenComponents();
@@ -478,16 +514,40 @@ public class MainActivity extends AppCompatActivity implements
         return 0;
     }
 
+    private static class IconOption {
+        final String name;
+        final String key;
+        final int iconRes;
+
+        IconOption(String name, String key, int iconRes) {
+            this.name = name;
+            this.key = key;
+            this.iconRes = iconRes;
+        }
+    }
+
+    private void applyBlurAndDimToDialog(AlertDialog dialog) {
+        if (dialog != null && dialog.getWindow() != null) {
+            Window window = dialog.getWindow();
+            window.setDimAmount(0.65f);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                window.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+                window.getAttributes().setBlurBehindRadius(35);
+            }
+        }
+    }
+
     private void showAddShortcutDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Add Shortcut Card");
 
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_edit_shortcut, null);
+        ImageView closeBtn = view.findViewById(R.id.dialog_btn_close);
         EditText etName = view.findViewById(R.id.dialog_et_name);
         EditText etScript = view.findViewById(R.id.dialog_et_script);
         Spinner spIcon = view.findViewById(R.id.dialog_sp_icon);
         View pinBtn = view.findViewById(R.id.dialog_btn_pin);
         View delBtn = view.findViewById(R.id.dialog_btn_delete);
+        View saveBtn = view.findViewById(R.id.dialog_btn_save);
 
         pinBtn.setVisibility(View.GONE);
         delBtn.setVisibility(View.GONE);
@@ -495,10 +555,15 @@ public class MainActivity extends AppCompatActivity implements
         setupIconSpinner(spIcon, "bolt");
         builder.setView(view);
 
-        builder.setPositiveButton("Save", (dialog, which) -> {
+        AlertDialog dialog = builder.create();
+
+        closeBtn.setOnClickListener(v -> dialog.dismiss());
+
+        saveBtn.setOnClickListener(v -> {
             String name = etName.getText().toString();
             String script = etScript.getText().toString();
-            String icon = spIcon.getSelectedItem().toString().toLowerCase(Locale.ROOT);
+            IconOption selected = (IconOption) spIcon.getSelectedItem();
+            String icon = selected != null ? selected.key : "bolt";
 
             if (!name.isEmpty()) {
                 String id = UUID.randomUUID().toString();
@@ -506,22 +571,24 @@ public class MainActivity extends AppCompatActivity implements
                 shortcutAdapter.notifyItemInserted(shortcutsList.size() - 1);
                 shortcutHelper.saveShortcuts(shortcutsList);
             }
+            dialog.dismiss();
         });
 
-        builder.setNegativeButton("Cancel", null);
-        builder.show();
+        applyBlurAndDimToDialog(dialog);
+        dialog.show();
     }
 
     private void showEditShortcutDialog(ShortcutItem item) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Edit Shortcut Card");
 
         View view = LayoutInflater.from(this).inflate(R.layout.dialog_edit_shortcut, null);
+        ImageView closeBtn = view.findViewById(R.id.dialog_btn_close);
         EditText etName = view.findViewById(R.id.dialog_et_name);
         EditText etScript = view.findViewById(R.id.dialog_et_script);
         Spinner spIcon = view.findViewById(R.id.dialog_sp_icon);
         Button pinBtn = view.findViewById(R.id.dialog_btn_pin);
-        Button delBtn = view.findViewById(R.id.dialog_btn_delete);
+        View delBtn = view.findViewById(R.id.dialog_btn_delete);
+        View saveBtn = view.findViewById(R.id.dialog_btn_save);
 
         etName.setText(item.name);
         etScript.setText(item.script);
@@ -530,19 +597,21 @@ public class MainActivity extends AppCompatActivity implements
         builder.setView(view);
         AlertDialog dialog = builder.create();
 
-        dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Save", (d, which) -> {
+        closeBtn.setOnClickListener(v -> dialog.dismiss());
+
+        saveBtn.setOnClickListener(v -> {
             item.name = etName.getText().toString();
             item.script = etScript.getText().toString();
-            item.iconName = spIcon.getSelectedItem().toString().toLowerCase(Locale.ROOT);
+            IconOption selected = (IconOption) spIcon.getSelectedItem();
+            item.iconName = selected != null ? selected.key : "bolt";
 
             int idx = shortcutsList.indexOf(item);
             if (idx != -1) {
                 shortcutAdapter.notifyItemChanged(idx);
                 shortcutHelper.saveShortcuts(shortcutsList);
             }
+            dialog.dismiss();
         });
-
-        dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", (d, w) -> {});
 
         pinBtn.setOnClickListener(v -> {
             boolean success = shortcutHelper.pinShortcutToHomeScreen(item);
@@ -560,18 +629,52 @@ public class MainActivity extends AppCompatActivity implements
             dialog.dismiss();
         });
 
+        applyBlurAndDimToDialog(dialog);
         dialog.show();
     }
 
     private void setupIconSpinner(Spinner spinner, String selectedIcon) {
-        String[] icons = {"Bolt", "Lock", "Terminal", "Key", "Web", "Keyboard"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, icons);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        List<IconOption> options = new ArrayList<>();
+        options.add(new IconOption("Bolt", "bolt", R.drawable.ic_shortcut_bolt));
+        options.add(new IconOption("Lock", "lock", R.drawable.ic_shortcut_lock));
+        options.add(new IconOption("Terminal", "terminal", R.drawable.ic_shortcut_terminal));
+        options.add(new IconOption("Key", "key", R.drawable.ic_shortcut_key));
+        options.add(new IconOption("Web", "web", R.drawable.ic_shortcut_web));
+        options.add(new IconOption("Keyboard", "keyboard", R.drawable.ic_shortcut_keyboard));
+
+        ArrayAdapter<IconOption> adapter = new ArrayAdapter<IconOption>(this, R.layout.item_icon_spinner, options) {
+            @NonNull
+            @Override
+            public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+                return createCustomView(position, convertView, parent);
+            }
+
+            @Override
+            public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
+                return createCustomView(position, convertView, parent);
+            }
+
+            private View createCustomView(int position, View convertView, ViewGroup parent) {
+                View row = convertView;
+                if (row == null) {
+                    row = LayoutInflater.from(getContext()).inflate(R.layout.item_icon_spinner, parent, false);
+                }
+                IconOption item = getItem(position);
+                if (item != null) {
+                    ImageView iv = row.findViewById(R.id.iv_spinner_icon);
+                    TextView tv = row.findViewById(R.id.tv_spinner_name);
+                    iv.setImageResource(item.iconRes);
+                    tv.setText(item.name);
+                }
+                return row;
+            }
+        };
+
         spinner.setAdapter(adapter);
 
         int selectIdx = 0;
-        for (int i = 0; i < icons.length; i++) {
-            if (icons[i].toLowerCase(Locale.ROOT).equals(selectedIcon)) {
+        for (int i = 0; i < options.size(); i++) {
+            if (options.get(i).key.equalsIgnoreCase(selectedIcon)) {
                 selectIdx = i;
                 break;
             }
@@ -597,7 +700,9 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
         builder.setNegativeButton("Cancel", null);
-        builder.show();
+        AlertDialog dialog = builder.create();
+        applyBlurAndDimToDialog(dialog);
+        dialog.show();
     }
 
     private void showLibraryDialog(EditText editor) {
@@ -619,7 +724,9 @@ public class MainActivity extends AppCompatActivity implements
             String script = libPrefs.getString(name, "");
             editor.setText(script);
         });
-        builder.show();
+        AlertDialog dialog = builder.create();
+        applyBlurAndDimToDialog(dialog);
+        dialog.show();
     }
 
     private void showHelpDialog() {
@@ -634,7 +741,9 @@ public class MainActivity extends AppCompatActivity implements
                 "ALT <key>\n- Presses key with Alt modifier.\n\n" +
                 "REM / //\n- Comments are ignored.");
         builder.setPositiveButton("Dismiss", null);
-        builder.show();
+        AlertDialog dialog = builder.create();
+        applyBlurAndDimToDialog(dialog);
+        dialog.show();
     }
 
     @Override
