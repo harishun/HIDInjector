@@ -103,7 +103,7 @@
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@drawable/ic_save"
+                android:src="@drawable/save_24"
                 app:tint="@color/status_green"
                 android:layout_gravity="center"
                 android:contentDescription="Save" />

@@ -35,7 +35,6 @@ public class MouseController {
 
     public void setupTrackpad(View trackpadView) {
         final int touchSlop = ViewConfiguration.get(trackpadView.getContext()).getScaledTouchSlop();
-        final int swipeThreshold = touchSlop * 3;
 
         trackpadView.setOnTouchListener((v, event) -> {
             if (!hidKeyboard.isConnected()) {
@@ -130,7 +129,7 @@ public class MouseController {
                             accumulatorY -= moveY;
                         }
                     } else if (pointerCount >= 2) {
-                        // Two or more fingers -> Trackpad Scroll Wheel
+                        // Two or more fingers -> Fast responsive Trackpad Scroll Wheel
                         float sumY = 0;
                         for (int i = 0; i < pointerCount; i++) {
                             sumY += event.getY(i);
@@ -142,7 +141,7 @@ public class MouseController {
                             isMultiTouchActive = true;
                         } else {
                             float dyMulti = previousMultiY - avgY; // Positive when scrolling UP
-                            scrollAccumulatorY += dyMulti * 0.25f;
+                            scrollAccumulatorY += dyMulti * 1.5f;
 
                             int scrollSteps = (int) scrollAccumulatorY;
                             if (scrollSteps != 0) {
@@ -176,30 +175,6 @@ public class MouseController {
                             // 3-Finger Tap -> Middle Click
                             sendMouseButton(true, (byte) 0x04);
                             handler.postDelayed(() -> sendMouseButton(false, (byte) 0x04), 50);
-                        }
-                    } else if (maxPointerCount >= 3) {
-                        // 3-Finger Swipe Gestures
-                        float deltaX = x - downX;
-                        float deltaY = y - downY;
-
-                        if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                            if (deltaX > swipeThreshold) {
-                                // 3-Finger Swipe Right -> Alt + Tab
-                                hidKeyboard.sendKeyWithModifier((byte) 0x04, 't');
-                            } else if (deltaX < -swipeThreshold) {
-                                // 3-Finger Swipe Left -> Alt + Shift + Tab
-                                hidKeyboard.transmitReport((byte) 0x06, (byte) 0x2B);
-                                handler.postDelayed(() -> hidKeyboard.transmitReport((byte) 0x00, (byte) 0x00), 50);
-                            }
-                        } else {
-                            if (deltaY < -swipeThreshold) {
-                                // 3-Finger Swipe Up -> Win + Tab (Task View)
-                                hidKeyboard.transmitReport((byte) 0x08, (byte) 0x2B);
-                                handler.postDelayed(() -> hidKeyboard.transmitReport((byte) 0x00, (byte) 0x00), 50);
-                            } else if (deltaY > swipeThreshold) {
-                                // 3-Finger Swipe Down -> Win + D (Show Desktop)
-                                hidKeyboard.sendKeyWithModifier((byte) 0x08, 'd');
-                            }
                         }
                     }
                     v.performClick();
