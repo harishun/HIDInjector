@@ -8,6 +8,7 @@ public class SettingsManager {
     private static final String KEY_OS = "target_os";
     private static final String KEY_SENSITIVITY = "mouse_sensitivity";
     private static final String KEY_LAYOUT = "keyboard_layout";
+    private static final String KEY_LAST_DEVICE = "last_connected_device";
 
     private final SharedPreferences prefs;
 
@@ -45,5 +46,13 @@ public class SettingsManager {
 
     public void setNightMode(boolean isNight) {
         prefs.edit().putBoolean("theme_night", isNight).apply();
+    }
+
+    public String getLastConnectedDeviceAddress() {
+        return prefs.getString(KEY_LAST_DEVICE, null);
+    }
+
+    public void setLastConnectedDeviceAddress(String address) {
+        prefs.edit().putString(KEY_LAST_DEVICE, address).apply();
     }
 }

@@ -1,28 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="20dp"
     android:background="@color/bg_card">
 
-    <!-- Header Row with Red X at Top Left -->
+    <!-- Header Row with Red X at Top Right -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp">
-
-        <ImageView
-            android:id="@+id/dialog_btn_close"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/ic_close"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:contentDescription="Close Popup"
-            android:clickable="true"
-            android:focusable="true" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -32,6 +22,17 @@
             android:textSize="18sp"
             android:textStyle="bold"
             android:layout_centerInParent="true" />
+
+        <ImageView
+            android:id="@+id/dialog_btn_close"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_close"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="Close Popup"
+            android:clickable="true"
+            android:focusable="true" />
     </RelativeLayout>
 
     <TextView
@@ -73,14 +74,41 @@
         android:paddingHorizontal="8dp"
         android:layout_marginBottom="16dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
+    <!-- Ducky Script Header with Save Icon Beside Title -->
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Ducky Script Payload"
-        android:textColor="@color/text_secondary"
-        android:textSize="12sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ducky Script Payload"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true" />
+
+        <FrameLayout
+            android:id="@+id/dialog_btn_save"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/button_secondary"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:clickable="true"
+            android:focusable="true">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_save"
+                app:tint="@color/status_green"
+                android:layout_gravity="center"
+                android:contentDescription="Save" />
+        </FrameLayout>
+    </RelativeLayout>
 
     <EditText
         android:id="@+id/dialog_et_script"
@@ -104,20 +132,10 @@
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
-        <Button
+        <FrameLayout
             android:id="@+id/dialog_btn_pin"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="48dp"
-            android:text="Create Shortcut"
-            android:textSize="13sp"
-            android:textColor="@color/text_primary"
-            android:background="@drawable/button_secondary"
-            android:layout_marginEnd="8dp" />
-
-        <FrameLayout
-            android:id="@+id/dialog_btn_delete"
-            android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="@drawable/button_secondary"
             android:layout_marginEnd="8dp"
@@ -127,13 +145,14 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_trash"
+                android:src="@drawable/ic_home_pin"
+                app:tint="@color/text_primary"
                 android:layout_gravity="center"
-                android:contentDescription="Delete" />
+                android:contentDescription="Add to Home Screen" />
         </FrameLayout>
 
         <FrameLayout
-            android:id="@+id/dialog_btn_save"
+            android:id="@+id/dialog_btn_delete"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="@drawable/button_secondary"
@@ -143,9 +162,9 @@
             <ImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/ic_save"
+                android:src="@drawable/ic_trash"
                 android:layout_gravity="center"
-                android:contentDescription="Save" />
+                android:contentDescription="Delete" />
         </FrameLayout>
     </LinearLayout>
 

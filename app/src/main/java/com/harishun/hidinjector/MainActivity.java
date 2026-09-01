@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements
     private void bindViews() {
         ImageView btnTheme = findViewById(R.id.btn_theme);
         if (btnTheme != null) {
-            btnTheme.setImageResource(settingsManager.isNightMode() ? R.drawable.ic_theme : R.drawable.ic_moon);
+            btnTheme.setImageResource(settingsManager.isNightMode() ? R.drawable.dark_mode_24 : R.drawable.light_mode_24);
             btnTheme.setOnClickListener(v -> toggleTheme());
         }
 
@@ -281,15 +281,31 @@ public class MainActivity extends AppCompatActivity implements
         List<String> names = new ArrayList<>();
         names.add("Select device...");
 
-        for (BluetoothDevice dev : pairedDevices) {
+        String lastAddress = settingsManager.getLastConnectedDeviceAddress();
+        int autoConnectPosition = -1;
+
+        for (int i = 0; i < pairedDevices.size(); i++) {
+            BluetoothDevice dev = pairedDevices.get(i);
             @SuppressLint("MissingPermission")
             String name = dev.getName() != null ? dev.getName() : dev.getAddress();
             names.add(name);
+
+            if (lastAddress != null && dev.getAddress().equalsIgnoreCase(lastAddress)) {
+                autoConnectPosition = i + 1;
+            }
         }
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, names);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerDevices.setAdapter(adapter);
+
+        if (autoConnectPosition != -1) {
+            spinnerDevices.setSelection(autoConnectPosition);
+            if (hidKeyboard != null && !hidKeyboard.isConnected()) {
+                BluetoothDevice autoDevice = pairedDevices.get(autoConnectPosition - 1);
+                hidKeyboard.connectToDevice(autoDevice);
+            }
+        }
 
         spinnerDevices.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -387,12 +403,12 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void setupScriptingScreenComponents() {
-        Button executeBtn = findViewById(R.id.btn_execute_script);
+        View executeBtn = findViewById(R.id.btn_execute_script);
         EditText etScript = findViewById(R.id.et_ducky_script);
         TextView tvStatus = findViewById(R.id.tv_script_status);
 
-        Button libBtn = findViewById(R.id.btn_script_library);
-        Button saveBtn = findViewById(R.id.btn_script_save);
+        View libBtn = findViewById(R.id.btn_script_library);
+        View saveBtn = findViewById(R.id.btn_script_save);
 
         executeBtn.setOnClickListener(v -> {
             if (!checkConnectionOrWarn()) return;
@@ -586,7 +602,7 @@ public class MainActivity extends AppCompatActivity implements
         EditText etName = view.findViewById(R.id.dialog_et_name);
         EditText etScript = view.findViewById(R.id.dialog_et_script);
         Spinner spIcon = view.findViewById(R.id.dialog_sp_icon);
-        Button pinBtn = view.findViewById(R.id.dialog_btn_pin);
+        View pinBtn = view.findViewById(R.id.dialog_btn_pin);
         View delBtn = view.findViewById(R.id.dialog_btn_delete);
         View saveBtn = view.findViewById(R.id.dialog_btn_save);
 
@@ -786,6 +802,9 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onConnectionStatusChanged(BluetoothDevice device, int state) {
+        if (state == BluetoothProfile.STATE_CONNECTED && device != null) {
+            settingsManager.setLastConnectedDeviceAddress(device.getAddress());
+        }
         runOnUiThread(() -> {
             if (state == BluetoothProfile.STATE_CONNECTED) {
                 viewStatusDot.setBackgroundColor(ContextCompat.getColor(this, R.color.status_green));
