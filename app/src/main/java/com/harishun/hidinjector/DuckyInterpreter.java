@@ -77,32 +77,41 @@ public class DuckyInterpreter {
 
                 case "GUI":
                 case "WINDOWS":
-                    if (!arg.isEmpty()) {
-                        final char key = arg.toLowerCase().charAt(0);
-                        handler.postDelayed(() -> hidKeyboard.sendKeyWithModifier((byte) 0x08, key), delayOffset);
-                    } else {
-                        handler.postDelayed(() -> hidKeyboard.sendModifierOnly((byte) 0x08), delayOffset);
+                    {
+                        final String cleanArg = arg.trim();
+                        if (!cleanArg.isEmpty()) {
+                            final char key = cleanArg.toLowerCase().charAt(0);
+                            handler.postDelayed(() -> hidKeyboard.sendKeyWithModifier((byte) 0x08, key), delayOffset);
+                        } else {
+                            handler.postDelayed(() -> hidKeyboard.sendModifierOnly((byte) 0x08), delayOffset);
+                        }
                     }
                     delayOffset += 40;
                     break;
 
                 case "CTRL":
                 case "CONTROL":
-                    if (!arg.isEmpty()) {
-                        final char key = arg.toLowerCase().charAt(0);
-                        handler.postDelayed(() -> hidKeyboard.sendKeyWithModifier((byte) 0x01, key), delayOffset);
-                    } else {
-                        handler.postDelayed(() -> hidKeyboard.sendModifierOnly((byte) 0x01), delayOffset);
+                    {
+                        final String cleanArg = arg.trim();
+                        if (!cleanArg.isEmpty()) {
+                            final char key = cleanArg.toLowerCase().charAt(0);
+                            handler.postDelayed(() -> hidKeyboard.sendKeyWithModifier((byte) 0x01, key), delayOffset);
+                        } else {
+                            handler.postDelayed(() -> hidKeyboard.sendModifierOnly((byte) 0x01), delayOffset);
+                        }
                     }
                     delayOffset += 40;
                     break;
 
                 case "ALT":
-                    if (!arg.isEmpty()) {
-                        final char key = arg.toLowerCase().charAt(0);
-                        handler.postDelayed(() -> hidKeyboard.sendKeyWithModifier((byte) 0x04, key), delayOffset);
-                    } else {
-                        handler.postDelayed(() -> hidKeyboard.sendModifierOnly((byte) 0x04), delayOffset);
+                    {
+                        final String cleanArg = arg.trim();
+                        if (!cleanArg.isEmpty()) {
+                            final char key = cleanArg.toLowerCase().charAt(0);
+                            handler.postDelayed(() -> hidKeyboard.sendKeyWithModifier((byte) 0x04, key), delayOffset);
+                        } else {
+                            handler.postDelayed(() -> hidKeyboard.sendModifierOnly((byte) 0x04), delayOffset);
+                        }
                     }
                     delayOffset += 40;
                     break;

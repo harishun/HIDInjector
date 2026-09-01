@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_slate">
@@ -9,8 +10,8 @@
     <RelativeLayout
         android:id="@+id/action_bar"
         android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:background="#0C0C54"
+        android:layout_height="100dp"
+        android:background="@color/bg_header"
         android:paddingHorizontal="16dp"
         android:gravity="center_vertical">
 
@@ -19,8 +20,9 @@
             android:layout_height="wrap_content"
             android:text="HID Control Center"
             android:textColor="@color/text_primary"
-            android:textSize="20sp"
+            android:textSize="30sp"
             android:textStyle="bold"
+            android:layout_marginTop="20dp"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true" />
 
@@ -28,6 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_marginTop="20dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true">
 
@@ -36,6 +39,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_theme"
+                app:tint="@color/text_primary"
                 android:layout_marginEnd="20dp"
                 android:contentDescription="Toggle Theme" />
 
@@ -44,6 +48,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_refresh"
+                app:tint="@color/text_primary"
                 android:contentDescription="Refresh Link" />
         </LinearLayout>
     </RelativeLayout>
@@ -55,35 +60,35 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_below="@id/action_bar"
-        android:background="#12121A"
+        android:background="@color/bg_slate"
         android:padding="16dp"
-        android:gravity="center_vertical">
+        android:gravity="center_vertical"
+        android:weightSum="6">
 
         <Spinner
             android:id="@+id/spinner_devices"
             android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="48dp"
+            android:layout_weight="4"
+            android:layout_height="50dp"
             android:background="@drawable/spinner_background"
             android:paddingHorizontal="12dp"
             android:spinnerMode="dropdown" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="2"
+            android:layout_height="50dp"
             android:orientation="horizontal"
-            android:layout_marginStart="12dp"
+            android:layout_marginStart="10dp"
             android:background="@drawable/edit_text_background"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="8dp"
-            android:gravity="center_vertical">
+            android:gravity="center">
 
             <View
                 android:id="@+id/view_status_dot"
                 android:layout_width="8dp"
                 android:layout_height="8dp"
-                android:background="@color/status_red"
-                android:layout_marginEnd="6dp" />
+                android:layout_marginEnd="6dp"
+                android:background="@color/status_red" />
 
             <TextView
                 android:id="@+id/tv_status_on"
@@ -173,6 +178,7 @@
                     android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:text="Left"
+                    android:textSize="20sp"
                     android:textColor="@color/text_primary"
                     android:background="@drawable/card_background"
                     android:layout_marginEnd="8dp" />
@@ -183,6 +189,7 @@
                     android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:text="Middle"
+                    android:textSize="20sp"
                     android:textColor="@color/text_primary"
                     android:background="@drawable/card_background"
                     android:layout_marginEnd="8dp" />
@@ -193,6 +200,7 @@
                     android:layout_weight="1"
                     android:layout_height="match_parent"
                     android:text="Right"
+                    android:textSize="20sp"
                     android:textColor="@color/text_primary"
                     android:background="@drawable/card_background" />
             </LinearLayout>
@@ -221,6 +229,7 @@
                     android:textColorHint="@color/text_hint"
                     android:background="@null"
                     android:layout_marginStart="12dp"
+                    android:importantForAutofill="no"
                     android:inputType="textNoSuggestions" />
             </LinearLayout>
         </LinearLayout>
@@ -238,7 +247,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="12dp">
+                android:layout_marginBottom="20dp">
 
                 <Button
                     android:id="@+id/btn_script_library"
@@ -246,11 +255,12 @@
                     android:layout_weight="1"
                     android:layout_height="48dp"
                     android:text="Library"
+                    android:textSize="20sp"
                     android:drawableStart="@drawable/ic_library"
                     android:textColor="@color/text_primary"
                     android:background="@drawable/button_secondary"
                     android:paddingHorizontal="16dp"
-                    android:layout_marginEnd="8dp" />
+                    android:layout_marginEnd="15dp" />
 
                 <Button
                     android:id="@+id/btn_script_save"
@@ -258,6 +268,7 @@
                     android:layout_weight="1"
                     android:layout_height="48dp"
                     android:text="Save"
+                    android:textSize="20sp"
                     android:drawableStart="@drawable/ic_save"
                     android:textColor="@color/text_primary"
                     android:background="@drawable/button_secondary"
@@ -271,7 +282,7 @@
                 android:layout_height="match_parent"
                 android:layout_below="@id/script_top_actions"
                 android:layout_above="@+id/btn_execute_script"
-                android:layout_marginBottom="12dp"
+                android:layout_marginBottom="20dp"
                 android:hint="Ducky Script"
                 android:textColor="@color/text_primary"
                 android:textColorHint="@color/text_hint"
@@ -279,6 +290,7 @@
                 android:background="@drawable/edit_text_background"
                 android:padding="16dp"
                 android:inputType="textMultiLine"
+                android:importantForAutofill="no"
                 android:scrollbars="vertical" />
 
             <!-- Execute Script Button -->
@@ -288,6 +300,7 @@
                 android:layout_height="54dp"
                 android:layout_above="@+id/tv_script_status"
                 android:text="EXECUTE SCRIPT"
+                android:textSize="20sp"
                 android:drawableStart="@drawable/ic_shortcuts"
                 android:textColor="@color/text_primary"
                 android:background="@drawable/button_primary"
@@ -550,6 +563,7 @@
         android:background="#12121A"
         android:orientation="horizontal"
         android:gravity="center"
+        android:layout_marginBottom="20dp"
         android:paddingVertical="8dp">
         <!-- Shortcuts Tab -->
         <LinearLayout
@@ -566,7 +580,7 @@
                 android:id="@+id/container_shortcuts_pill"
                 android:layout_width="64dp"
                 android:layout_height="32dp"
-                android:layout_marginBottom="4dp">
+                android:layout_marginBottom="10dp">
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
@@ -600,7 +614,7 @@
                 android:id="@+id/container_input_pill"
                 android:layout_width="64dp"
                 android:layout_height="32dp"
-                android:layout_marginBottom="4dp">
+                android:layout_marginBottom="10dp">
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
@@ -633,7 +647,7 @@
                 android:id="@+id/container_scripting_pill"
                 android:layout_width="64dp"
                 android:layout_height="32dp"
-                android:layout_marginBottom="4dp">
+                android:layout_marginBottom="10dp">
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
@@ -666,7 +680,7 @@
                 android:id="@+id/container_settings_pill"
                 android:layout_width="64dp"
                 android:layout_height="32dp"
-                android:layout_marginBottom="4dp">
+                android:layout_marginBottom="10dp">
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"

@@ -38,4 +38,12 @@ public class SettingsManager {
     public void setKeyboardLayout(String layout) {
         prefs.edit().putString(KEY_LAYOUT, layout).apply();
     }
+
+    public boolean isNightMode() {
+        return prefs.getBoolean("theme_night", true);
+    }
+
+    public void setNightMode(boolean isNight) {
+        prefs.edit().putBoolean("theme_night", isNight).apply();
+    }
 }

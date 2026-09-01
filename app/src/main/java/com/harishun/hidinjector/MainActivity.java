@@ -31,6 +31,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -71,10 +72,16 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        settingsManager = new SettingsManager(this);
+        if (settingsManager.isNightMode()) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        settingsManager = new SettingsManager(this);
         shortcutHelper = new ShortcutManagerHelper(this);
         shortcutsList = shortcutHelper.getShortcuts();
 
@@ -91,9 +98,18 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void bindViews() {
-        findViewById(R.id.btn_theme).setOnClickListener(v -> 
-            Toast.makeText(this, "Theme switching is PRO feature.", Toast.LENGTH_SHORT).show());
-        findViewById(R.id.btn_refresh_bar).setOnClickListener(v -> refreshDeviceList());
+        findViewById(R.id.btn_theme).setOnClickListener(v -> {
+            boolean isNight = !settingsManager.isNightMode();
+            settingsManager.setNightMode(isNight);
+            if (isNight) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            }
+            recreate();
+        });
+
+        findViewById(R.id.btn_refresh_bar).setOnClickListener(v -> refreshAllSystems());
 
         spinnerDevices = findViewById(R.id.spinner_devices);
         viewStatusDot = findViewById(R.id.view_status_dot);
@@ -175,12 +191,23 @@ public class MainActivity extends AppCompatActivity implements
 
         refreshDeviceList();
         setupShortcutsGrid();
+    }
 
-        Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADVERTISE) == PackageManager.PERMISSION_GRANTED || Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
-            startActivity(discoverableIntent);
+    private void refreshAllSystems() {
+        Toast.makeText(this, "Refreshing HID service & device list...", Toast.LENGTH_SHORT).show();
+        if (hidKeyboard != null) {
+            hidKeyboard.cleanup();
         }
+        hidKeyboard = new BluetoothHidKeyboard(this, this);
+        hidKeyboard.setupService();
+        duckyInterpreter = new DuckyInterpreter(hidKeyboard);
+
+        // Rebind input screen controllers to the new service instance
+        if (mouseController != null || keyboardInputHandler != null) {
+            setupInputScreenComponents();
+        }
+
+        refreshDeviceList();
     }
 
     @Override
@@ -419,11 +446,22 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         helpBtn.setOnClickListener(v -> showHelpDialog());
-        discoverableBtn.setOnClickListener(v -> {
-            Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-            discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-            startActivity(discoverableIntent);
-        });
+        discoverableBtn.setOnClickListener(v -> makeDiscoverable());
+    }
+
+    @SuppressLint("MissingPermission")
+    private void makeDiscoverable() {
+        if (hasBluetoothPermissions()) {
+            try {
+                Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
+                discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
+                startActivity(discoverableIntent);
+            } catch (Exception e) {
+                Toast.makeText(this, "Failed to start discoverability request", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            requestBluetoothPermissions();
+        }
     }
 
     private int getTargetOSIndex(String os) {
