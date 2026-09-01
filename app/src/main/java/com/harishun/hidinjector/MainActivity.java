@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements
     private void bindViews() {
         ImageView btnTheme = findViewById(R.id.btn_theme);
         if (btnTheme != null) {
-            btnTheme.setImageResource(settingsManager.isNightMode() ? R.drawable.dark_mode_24 : R.drawable.light_mode_24);
+            btnTheme.setImageResource(settingsManager.isNightMode() ? R.drawable.light_mode_24 : R.drawable.dark_mode_24);
             btnTheme.setOnClickListener(v -> toggleTheme());
         }
 

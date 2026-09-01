@@ -2,11 +2,13 @@
 <resources>
     <color name="bg_slate">#12121A</color>
     <color name="bg_card">#1E1E2C</color>
-    <color name="bg_header">#5B21B6</color>
+    <color name="bg_header">#0F172A</color>
     <color name="text_primary">#F8FAFC</color>
     <color name="text_secondary">#94A3B8</color>
     <color name="text_hint">#475569</color>
-    <color name="border_focus">#A78BFA</color>
+    <color name="border_focus">#3B82F6</color>
     <color name="border_normal">#334155</color>
     <color name="nav_pill">#33334C</color>
+    <color name="btn_grape">#6B21A8</color>
+    <color name="btn_grape_dark">#581C87</color>
 </resources>
