@@ -122,13 +122,10 @@ public class BluetoothHidKeyboard {
 
     @SuppressLint("MissingPermission")
     private void registerHidApp() {
-        // We pass standard corporate ID markers to clear OS vendor validation sweeps
-        // 0x046D = Logitech Vendor ID (forces the host computer to trust the incoming packet)
-        // 0xC31C = Standard Keyboard Product ID
         BluetoothHidDeviceAppSdpSettings sdpSettings = new BluetoothHidDeviceAppSdpSettings(
-                "Java HID Keyboard",
-                "Virtual Input Device",
-                "Logitech Inc.", // Changing provider to a standard descriptor string
+                "HID Injector Keyboard",
+                "Virtual HID Input Device",
+                "HID Injector",
                 (byte) 0xC0, // Combo Keyboard + Mouse subclass
                 HID_REPORT_DESCRIPTOR
         );
