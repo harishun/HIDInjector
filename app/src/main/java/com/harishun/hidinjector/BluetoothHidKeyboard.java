@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothHidDevice;
 import android.bluetooth.BluetoothHidDeviceAppSdpSettings;
-import android.bluetooth.BluetoothHidDeviceAppQosSettings;
 import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.os.Handler;
@@ -27,7 +26,7 @@ public class BluetoothHidKeyboard {
     private final BluetoothAdapter bluetoothAdapter;
     private BluetoothHidDevice hidDeviceService;
     private BluetoothDevice connectedHostDevice;
-    private OnHidStatusListener statusListener;
+    final private OnHidStatusListener statusListener;
     private boolean isAppRegistered = false;
 
 
@@ -48,7 +47,7 @@ public class BluetoothHidKeyboard {
             (byte) 0x81, 0x02,       //   INPUT (Data,Var,Abs) - Modifier Byte
             (byte) 0x95, 0x01,       //   REPORT_COUNT (1)
             (byte) 0x75, 0x08,       //   REPORT_SIZE (8)
-            (byte) 0x81, 0x03,       //   INPUT (Cnst,Var,Abs) - Reserved Byte
+            (byte) 0x81, 0x03,       //   INPUT (Const,Var,Abs) - Reserved Byte
             (byte) 0x95, 0x06,       //   REPORT_COUNT (6)
             (byte) 0x75, 0x08,       //   REPORT_SIZE (8)
             (byte) 0x15, 0x00,       //   LOGICAL_MINIMUM (0)
@@ -76,7 +75,7 @@ public class BluetoothHidKeyboard {
             (byte) 0x81, 0x02,       //     INPUT (Data,Var,Abs)
             (byte) 0x95, 0x01,       //     REPORT_COUNT (1)
             (byte) 0x75, 0x05,       //     REPORT_SIZE (5)
-            (byte) 0x81, 0x03,       //     INPUT (Cnst,Var,Abs)
+            (byte) 0x81, 0x03,       //     INPUT (Const,Var,Abs)
             (byte) 0x05, 0x01,       //     USAGE_PAGE (Generic Desktop)
             (byte) 0x09, 0x30,       //     USAGE (X)
             (byte) 0x09, 0x31,       //     USAGE (Y)
@@ -123,7 +122,7 @@ public class BluetoothHidKeyboard {
     @SuppressLint("MissingPermission")
     private void registerHidApp() {
         BluetoothHidDeviceAppSdpSettings sdpSettings = new BluetoothHidDeviceAppSdpSettings(
-                "HID Injector Keyboard",
+                "HID Injector",
                 "Virtual HID Input Device",
                 "HID Injector",
                 (byte) 0xC0, // Combo Keyboard + Mouse subclass
@@ -215,8 +214,28 @@ public class BluetoothHidKeyboard {
         }
     }
 
+    @SuppressLint("MissingPermission")
+    public BluetoothDevice getConnectedDevice() {
+        if (connectedHostDevice != null) {
+            return connectedHostDevice;
+        }
+        if (hidDeviceService != null) {
+            try {
+                List<BluetoothDevice> connected = hidDeviceService.getConnectedDevices();
+                if (connected != null && !connected.isEmpty()) {
+                    connectedHostDevice = connected.get(0);
+                    return connectedHostDevice;
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error getting connected devices", e);
+            }
+        }
+        return null;
+    }
+
     public void sendText(String text) {
-        if (hidDeviceService == null || connectedHostDevice == null || text == null) return;
+        BluetoothDevice target = getConnectedDevice();
+        if (hidDeviceService == null || target == null || text == null) return;
 
         List<byte[]> pipeline = new ArrayList<>();
         for (int i = 0; i < text.length(); i++) {
@@ -297,14 +316,15 @@ public class BluetoothHidKeyboard {
 
     @SuppressLint("MissingPermission")
     public void transmitReport(byte modifier, byte keycode) {
-        if (hidDeviceService == null || connectedHostDevice == null) return;
+        BluetoothDevice target = getConnectedDevice();
+        if (hidDeviceService == null || target == null) return;
 
         byte[] report = new byte[8];
         report[0] = modifier;
         report[1] = 0x00;
         report[2] = keycode;
 
-        hidDeviceService.sendReport(connectedHostDevice, 1, report);
+        hidDeviceService.sendReport(target, 1, report);
     }
 
     @SuppressLint("MissingPermission")
@@ -321,14 +341,15 @@ public class BluetoothHidKeyboard {
 
     @SuppressLint("MissingPermission")
     public void transmitMouseReport(byte buttons, byte x, byte y) {
-        if (hidDeviceService == null || connectedHostDevice == null) return;
+        BluetoothDevice target = getConnectedDevice();
+        if (hidDeviceService == null || target == null) return;
 
         byte[] report = new byte[3];
         report[0] = buttons;
         report[1] = x;
         report[2] = y;
 
-        hidDeviceService.sendReport(connectedHostDevice, 2, report);
+        hidDeviceService.sendReport(target, 2, report);
     }
 
     @SuppressLint("MissingPermission")
@@ -347,6 +368,6 @@ public class BluetoothHidKeyboard {
     }
 
     public boolean isConnected() {
-        return hidDeviceService != null && connectedHostDevice != null;
+        return getConnectedDevice() != null;
     }
 }
