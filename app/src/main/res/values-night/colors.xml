@@ -1,14 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="bg_slate">#12121A</color>
-    <color name="bg_card">#1E1E2C</color>
+    <color name="bg_slate">#0F172A</color>
+    <color name="bg_card">#1E293B</color>
     <color name="bg_header">#0F172A</color>
+
+    <!-- Accent Colors (Navy Blue Theme) -->
+    <color name="navy_primary">#1E3A8A</color>
+    <color name="navy_secondary">#3B82F6</color>
+    <color name="primary_grad_start">#1E3A8A</color>
+    <color name="primary_grad_end">#0F172A</color>
+
+    <!-- Button Colors (Grape Theme) -->
+    <color name="btn_grape_primary">#6B21A8</color>
+    <color name="btn_grape_dark">#581C87</color>
+    <color name="btn_grape_light_bg">#3B0764</color>
+    <color name="btn_grape_border">#7E22CE</color>
+
+    <!-- Text Colors -->
     <color name="text_primary">#F8FAFC</color>
     <color name="text_secondary">#94A3B8</color>
     <color name="text_hint">#475569</color>
+    <color name="text_grape">#C084FC</color>
+
+    <!-- Borders & Nav -->
     <color name="border_focus">#3B82F6</color>
     <color name="border_normal">#334155</color>
-    <color name="nav_pill">#33334C</color>
-    <color name="btn_grape">#6B21A8</color>
-    <color name="btn_grape_dark">#581C87</color>
+    <color name="nav_pill">#1E3A8A</color>
 </resources>
