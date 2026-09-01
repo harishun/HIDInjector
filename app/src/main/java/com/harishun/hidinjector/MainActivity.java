@@ -39,6 +39,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -497,7 +498,7 @@ public class MainActivity extends AppCompatActivity implements
         builder.setPositiveButton("Save", (dialog, which) -> {
             String name = etName.getText().toString();
             String script = etScript.getText().toString();
-            String icon = spIcon.getSelectedItem().toString().toLowerCase();
+            String icon = spIcon.getSelectedItem().toString().toLowerCase(Locale.ROOT);
 
             if (!name.isEmpty()) {
                 String id = UUID.randomUUID().toString();
@@ -532,7 +533,7 @@ public class MainActivity extends AppCompatActivity implements
         dialog.setButton(DialogInterface.BUTTON_POSITIVE, "Save", (d, which) -> {
             item.name = etName.getText().toString();
             item.script = etScript.getText().toString();
-            item.iconName = spIcon.getSelectedItem().toString().toLowerCase();
+            item.iconName = spIcon.getSelectedItem().toString().toLowerCase(Locale.ROOT);
 
             int idx = shortcutsList.indexOf(item);
             if (idx != -1) {
@@ -570,7 +571,7 @@ public class MainActivity extends AppCompatActivity implements
 
         int selectIdx = 0;
         for (int i = 0; i < icons.length; i++) {
-            if (icons[i].toLowerCase().equals(selectedIcon)) {
+            if (icons[i].toLowerCase(Locale.ROOT).equals(selectedIcon)) {
                 selectIdx = i;
                 break;
             }

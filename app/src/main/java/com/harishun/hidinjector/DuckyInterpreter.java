@@ -2,6 +2,7 @@ package com.harishun.hidinjector;
 
 import android.os.Handler;
 import android.os.Looper;
+import java.util.Locale;
 
 public class DuckyInterpreter {
     public interface InterpreterListener {
@@ -33,7 +34,7 @@ public class DuckyInterpreter {
             }
 
             String[] parts = line.split(" ", 2);
-            final String command = parts[0].toUpperCase();
+            final String command = parts[0].toUpperCase(Locale.ROOT);
             final String arg = parts.length > 1 ? parts[1] : "";
 
             if (listener != null) {
@@ -80,7 +81,7 @@ public class DuckyInterpreter {
                     {
                         final String cleanArg = arg.trim();
                         if (!cleanArg.isEmpty()) {
-                            final char key = cleanArg.toLowerCase().charAt(0);
+                            final char key = cleanArg.toLowerCase(Locale.ROOT).charAt(0);
                             handler.postDelayed(() -> hidKeyboard.sendKeyWithModifier((byte) 0x08, key), delayOffset);
                         } else {
                             handler.postDelayed(() -> hidKeyboard.sendModifierOnly((byte) 0x08), delayOffset);
@@ -94,7 +95,7 @@ public class DuckyInterpreter {
                     {
                         final String cleanArg = arg.trim();
                         if (!cleanArg.isEmpty()) {
-                            final char key = cleanArg.toLowerCase().charAt(0);
+                            final char key = cleanArg.toLowerCase(Locale.ROOT).charAt(0);
                             handler.postDelayed(() -> hidKeyboard.sendKeyWithModifier((byte) 0x01, key), delayOffset);
                         } else {
                             handler.postDelayed(() -> hidKeyboard.sendModifierOnly((byte) 0x01), delayOffset);
@@ -107,7 +108,7 @@ public class DuckyInterpreter {
                     {
                         final String cleanArg = arg.trim();
                         if (!cleanArg.isEmpty()) {
-                            final char key = cleanArg.toLowerCase().charAt(0);
+                            final char key = cleanArg.toLowerCase(Locale.ROOT).charAt(0);
                             handler.postDelayed(() -> hidKeyboard.sendKeyWithModifier((byte) 0x04, key), delayOffset);
                         } else {
                             handler.postDelayed(() -> hidKeyboard.sendModifierOnly((byte) 0x04), delayOffset);

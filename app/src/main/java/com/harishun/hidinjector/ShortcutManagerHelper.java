@@ -72,11 +72,7 @@ public class ShortcutManagerHelper {
         }
     }
 
-    @SuppressLint("NewApi")
     public boolean pinShortcutToHomeScreen(ShortcutItem item) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            return false;
-        }
         ShortcutManager sm = context.getSystemService(ShortcutManager.class);
         if (sm == null || !sm.isRequestPinShortcutSupported()) {
             return false;
