@@ -16,6 +16,8 @@ public class MouseController {
     private float accumulatorX = 0f;
     private float accumulatorY = 0f;
     private float scrollAccumulatorY = 0f;
+    private float previousMultiY = 0f;
+    private boolean isMultiTouchActive = false;
 
     private float downX = 0f;
     private float downY = 0f;
@@ -61,6 +63,7 @@ public class MouseController {
                     isMoved = false;
                     hasPerformedLongPress = false;
                     maxPointerCount = 1;
+                    isMultiTouchActive = false;
 
                     longPressRunnable = () -> {
                         if (!isMoved && maxPointerCount == 1) {
@@ -77,6 +80,19 @@ public class MouseController {
                     if (longPressRunnable != null) {
                         handler.removeCallbacks(longPressRunnable);
                     }
+                    if (event.getPointerCount() >= 2) {
+                        float sumY = 0;
+                        int count = event.getPointerCount();
+                        for (int i = 0; i < count; i++) {
+                            sumY += event.getY(i);
+                        }
+                        previousMultiY = sumY / count;
+                        isMultiTouchActive = true;
+                    }
+                    break;
+
+                case MotionEvent.ACTION_POINTER_UP:
+                    isMultiTouchActive = false;
                     break;
 
                 case MotionEvent.ACTION_MOVE:
@@ -96,6 +112,7 @@ public class MouseController {
                     }
 
                     if (pointerCount == 1) {
+                        isMultiTouchActive = false;
                         // Single finger -> Mouse motion
                         float sensitivity = settingsManager.getSensitivity();
                         accumulatorX += dx * sensitivity;
@@ -112,15 +129,28 @@ public class MouseController {
                             accumulatorX -= moveX;
                             accumulatorY -= moveY;
                         }
-                    } else if (pointerCount == 2) {
-                        // Two fingers -> Trackpad Scroll Wheel
-                        scrollAccumulatorY += dy * 0.5f;
-                        int scrollY = (int) scrollAccumulatorY;
-                        if (scrollY != 0) {
-                            // Negative dy = swipe up = scroll up (+1), positive dy = swipe down = scroll down (-1)
-                            byte wheel = (byte) Math.max(-127, Math.min(127, -scrollY));
-                            hidKeyboard.transmitMouseReport((byte) 0x00, (byte) 0, (byte) 0, wheel);
-                            scrollAccumulatorY -= scrollY;
+                    } else if (pointerCount >= 2) {
+                        // Two or more fingers -> Trackpad Scroll Wheel
+                        float sumY = 0;
+                        for (int i = 0; i < pointerCount; i++) {
+                            sumY += event.getY(i);
+                        }
+                        float avgY = sumY / pointerCount;
+
+                        if (!isMultiTouchActive) {
+                            previousMultiY = avgY;
+                            isMultiTouchActive = true;
+                        } else {
+                            float dyMulti = previousMultiY - avgY; // Positive when scrolling UP
+                            scrollAccumulatorY += dyMulti * 0.25f;
+
+                            int scrollSteps = (int) scrollAccumulatorY;
+                            if (scrollSteps != 0) {
+                                byte wheel = (byte) Math.max(-127, Math.min(127, scrollSteps));
+                                hidKeyboard.transmitMouseReport((byte) 0x00, (byte) 0, (byte) 0, wheel);
+                                scrollAccumulatorY -= scrollSteps;
+                            }
+                            previousMultiY = avgY;
                         }
                     }
 
