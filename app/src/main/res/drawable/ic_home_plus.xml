@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Home structure with circular cutout boundary in bottom-right corner -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M12,3L2,12h3v8h5v-6h4v6h0.5A4.5,4.5 0 0,1 19,13v-1h3L12,3z"/>
+    <!-- Plus badge centered inside the circular transparent cutout -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M16.5,14.5h2v2h2v2h-2v2h-2v-2h-2v-2h2V14.5z"/>
+</vector>

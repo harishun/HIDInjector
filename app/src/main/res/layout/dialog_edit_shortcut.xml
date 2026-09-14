@@ -2,35 +2,59 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="20dp"
-    android:background="@color/bg_card">
+    android:background="@drawable/dialog_card_background"
+    tools:ignore="Overdraw">
 
-    <!-- Header Row with Red X at Top Right -->
+    <!-- Header Row: Pin to Home (Top Left, Round), Title (Center), Close (Top Right) -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp">
 
+        <ImageView
+            android:id="@+id/dialog_btn_pin"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/button_round_glass"
+            android:scaleType="centerInside"
+            android:padding="9dp"
+            android:src="@drawable/ic_home_plus"
+            app:tint="#FFFFFF"
+            android:contentDescription="@string/desc_add_to_home_screen"
+            android:clickable="true"
+            android:focusable="true" />
+
         <TextView
-            android:layout_width="wrap_content"
+            android:id="@+id/dialog_tv_title"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Shortcut Details"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/dialog_btn_pin"
+            android:layout_toStartOf="@id/dialog_btn_close"
+            android:layout_marginHorizontal="8dp"
+            android:gravity="center"
+            android:text="@string/dialog_title_shortcut_details"
             android:textColor="@color/text_primary"
             android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_centerInParent="true" />
+            android:textStyle="bold" />
 
         <ImageView
             android:id="@+id/dialog_btn_close"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
             android:src="@drawable/ic_close"
+            app:tint="@color/status_red"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:contentDescription="Close Popup"
+            android:padding="8dp"
+            android:contentDescription="@string/desc_close_popup"
             android:clickable="true"
             android:focusable="true" />
     </RelativeLayout>
@@ -38,7 +62,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Shortcut Name"
+        android:text="@string/label_shortcut_name"
         android:textColor="@color/text_secondary"
         android:textSize="12sp"
         android:textStyle="bold"
@@ -48,7 +72,7 @@
         android:id="@+id/dialog_et_name"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:hint="e.g. Open Command Prompt"
+        android:hint="@string/hint_shortcut_name"
         android:textColor="@color/text_primary"
         android:textColorHint="@color/text_hint"
         android:background="@drawable/edit_text_background"
@@ -60,7 +84,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Shortcut Icon"
+        android:text="@string/label_shortcut_icon"
         android:textColor="@color/text_secondary"
         android:textSize="12sp"
         android:textStyle="bold"
@@ -72,49 +96,26 @@
         android:layout_height="48dp"
         android:background="@drawable/spinner_background"
         android:paddingHorizontal="8dp"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="16dp"
+        android:spinnerMode="dropdown"
+        android:overlapAnchor="false"
+        android:dropDownVerticalOffset="4dp"
+        android:dropDownHorizontalOffset="0dp" />
 
-    <!-- Ducky Script Header with Save Icon Beside Title -->
-    <RelativeLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ducky Script Payload"
-            android:textColor="@color/text_secondary"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true" />
-
-        <FrameLayout
-            android:id="@+id/dialog_btn_save"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:background="@drawable/button_secondary"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:clickable="true"
-            android:focusable="true">
-
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/save_24"
-                app:tint="@color/status_green"
-                android:layout_gravity="center"
-                android:contentDescription="Save" />
-        </FrameLayout>
-    </RelativeLayout>
+        android:text="@string/label_ducky_script_payload"
+        android:textColor="@color/text_secondary"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp" />
 
     <EditText
         android:id="@+id/dialog_et_script"
         android:layout_width="match_parent"
         android:layout_height="180dp"
-        android:hint="GUI r`nDELAY 500`nSTRING cmd`nENTER"
+        android:hint="@string/hint_ducky_script_default"
         android:textColor="@color/text_primary"
         android:textColorHint="@color/text_hint"
         android:gravity="top|start"
@@ -125,48 +126,39 @@
         android:scrollbars="vertical"
         android:layout_marginBottom="20dp" />
 
-    <!-- Action Buttons Row -->
+    <!-- Bottom Action Row: Save Button (Bottom Left), Delete Button (Bottom Right) -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
-        <FrameLayout
-            android:id="@+id/dialog_btn_pin"
+        <ImageView
+            android:id="@+id/dialog_btn_save"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="48dp"
-            android:background="@drawable/button_secondary"
+            android:background="@drawable/button_primary"
             android:layout_marginEnd="8dp"
+            android:src="@drawable/save_24"
+            app:tint="@color/status_green"
+            android:padding="12dp"
+            android:contentDescription="@string/desc_save"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true" />
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_home_pin"
-                app:tint="@color/text_primary"
-                android:layout_gravity="center"
-                android:contentDescription="Add to Home Screen" />
-        </FrameLayout>
-
-        <FrameLayout
+        <ImageView
             android:id="@+id/dialog_btn_delete"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="48dp"
-            android:background="@drawable/button_secondary"
+            android:background="@drawable/button_primary"
+            android:src="@drawable/ic_trash"
+            app:tint="@color/status_red"
+            android:padding="12dp"
+            android:contentDescription="@string/desc_delete"
             android:clickable="true"
-            android:focusable="true">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_trash"
-                android:layout_gravity="center"
-                android:contentDescription="Delete" />
-        </FrameLayout>
+            android:focusable="true" />
     </LinearLayout>
 
 </LinearLayout>

@@ -2,9 +2,13 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_slate">
+    android:background="@color/bg_slate"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    tools:ignore="TooManyViews,Overdraw">
 
     <!-- Top Action Bar -->
     <RelativeLayout
@@ -19,15 +23,18 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="HID Control Center"
+            android:text="@string/app_title"
             android:textColor="#FFFFFF"
             android:textSize="24sp"
             android:textStyle="bold"
             android:layout_marginTop="16dp"
             android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/header_right_actions"
+            android:layout_marginEnd="8dp"
             android:layout_centerVertical="true" />
 
         <LinearLayout
+            android:id="@+id/header_right_actions"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -41,7 +48,7 @@
                 android:layout_height="26dp"
                 android:src="@drawable/light_mode_24"
                 android:layout_marginEnd="20dp"
-                android:contentDescription="Toggle Theme" />
+                android:contentDescription="@string/toggle_theme" />
 
             <ImageView
                 android:id="@+id/btn_refresh_bar"
@@ -49,7 +56,7 @@
                 android:layout_height="26dp"
                 android:src="@drawable/ic_refresh"
                 app:tint="#FFFFFF"
-                android:contentDescription="Refresh Link" />
+                android:contentDescription="@string/refresh_link" />
         </LinearLayout>
     </RelativeLayout>
 
@@ -63,7 +70,8 @@
         android:background="@color/bg_slate"
         android:padding="16dp"
         android:gravity="center_vertical"
-        android:weightSum="6">
+        android:weightSum="6"
+        android:baselineAligned="false">
 
         <Spinner
             android:id="@+id/spinner_devices"
@@ -72,7 +80,10 @@
             android:layout_height="50dp"
             android:background="@drawable/spinner_background"
             android:paddingHorizontal="12dp"
-            android:spinnerMode="dropdown" />
+            android:spinnerMode="dropdown"
+            android:overlapAnchor="false"
+            android:dropDownVerticalOffset="4dp"
+            android:dropDownHorizontalOffset="0dp" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -94,7 +105,7 @@
                 android:id="@+id/tv_status_on"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="OFF"
+                android:text="@string/status_off"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -139,7 +150,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                android:background="@drawable/card_background"
+                android:background="@drawable/trackpad_background"
                 android:layout_marginBottom="16dp">
 
                 <LinearLayout
@@ -147,7 +158,8 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:layout_gravity="center"
-                    android:gravity="center">
+                    android:gravity="center"
+                    tools:ignore="UseCompoundDrawables,UselessParent">
 
                     <ImageView
                         android:layout_width="48dp"
@@ -155,12 +167,12 @@
                         android:src="@drawable/ic_trackpad"
                         app:tint="@color/text_primary"
                         android:layout_marginBottom="12dp"
-                        android:contentDescription="Trackpad" />
+                        android:contentDescription="@string/trackpad" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Trackpad"
+                        android:text="@string/trackpad"
                         android:textColor="@color/text_secondary"
                         android:textSize="16sp" />
                 </LinearLayout>
@@ -171,54 +183,58 @@
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="16dp"
+                tools:ignore="ButtonStyle">
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_mouse_left"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
-                    android:text="Left"
+                    android:text="@string/btn_left"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:drawableStart="@drawable/ic_mouse_left"
-                    android:drawableTint="@color/text_primary"
+                    android:drawableTint="#FFFFFF"
                     android:drawablePadding="6dp"
                     android:paddingHorizontal="12dp"
-                    android:textColor="@color/text_primary"
-                    android:background="@drawable/button_secondary"
+                    android:textColor="#FFFFFF"
+                    android:background="@drawable/button_primary"
+                    app:backgroundTint="@null"
                     android:layout_marginEnd="8dp" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_mouse_middle"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
-                    android:text="Middle"
+                    android:text="@string/btn_middle"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:drawableStart="@drawable/ic_mouse_middle"
-                    android:drawableTint="@color/text_primary"
+                    android:drawableTint="#FFFFFF"
                     android:drawablePadding="6dp"
                     android:paddingHorizontal="12dp"
-                    android:textColor="@color/text_primary"
-                    android:background="@drawable/button_secondary"
+                    android:textColor="#FFFFFF"
+                    android:background="@drawable/button_primary"
+                    app:backgroundTint="@null"
                     android:layout_marginEnd="8dp" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_mouse_right"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="match_parent"
-                    android:text="Right"
+                    android:text="@string/btn_right"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:drawableStart="@drawable/ic_mouse_right"
-                    android:drawableTint="@color/text_primary"
+                    android:drawableTint="#FFFFFF"
                     android:drawablePadding="6dp"
                     android:paddingHorizontal="12dp"
-                    android:textColor="@color/text_primary"
-                    android:background="@drawable/button_secondary" />
+                    android:textColor="#FFFFFF"
+                    android:background="@drawable/button_primary"
+                    app:backgroundTint="@null" />
             </LinearLayout>
 
             <!-- Real-time Keyboard input -->
@@ -235,13 +251,13 @@
                     android:layout_height="24dp"
                     android:src="@drawable/ic_keyboard"
                     app:tint="@color/text_primary"
-                    android:contentDescription="Keyboard" />
+                    android:contentDescription="@string/keyboard" />
 
                 <EditText
                     android:id="@+id/et_realtime_keyboard"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:hint="Type keys (real-time)..."
+                    android:hint="@string/hint_realtime_keyboard"
                     android:textColor="@color/text_primary"
                     android:textColorHint="@color/text_hint"
                     android:background="@null"
@@ -266,42 +282,32 @@
                 android:orientation="horizontal"
                 android:layout_marginBottom="20dp">
 
-                <FrameLayout
+                <ImageView
                     android:id="@+id/btn_script_library"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="48dp"
-                    android:background="@drawable/button_secondary"
+                    android:background="@drawable/button_primary"
                     android:layout_marginEnd="15dp"
+                    android:src="@drawable/newsstand_24"
+                    app:tint="#FFFFFF"
+                    android:padding="12dp"
+                    android:contentDescription="@string/desc_script_library"
                     android:clickable="true"
-                    android:focusable="true">
+                    android:focusable="true" />
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/newsstand_24"
-                        app:tint="@color/text_primary"
-                        android:layout_gravity="center"
-                        android:contentDescription="Script Library" />
-                </FrameLayout>
-
-                <FrameLayout
+                <ImageView
                     android:id="@+id/btn_script_save"
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="48dp"
-                    android:background="@drawable/button_secondary"
+                    android:background="@drawable/button_primary"
+                    android:src="@drawable/save_24"
+                    app:tint="@color/status_green"
+                    android:padding="12dp"
+                    android:contentDescription="@string/desc_save_script"
                     android:clickable="true"
-                    android:focusable="true">
-
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/save_24"
-                        app:tint="@color/text_primary"
-                        android:layout_gravity="center"
-                        android:contentDescription="Save Script" />
-                </FrameLayout>
+                    android:focusable="true" />
             </LinearLayout>
 
             <!-- Editor -->
@@ -312,7 +318,7 @@
                 android:layout_below="@id/script_top_actions"
                 android:layout_above="@+id/btn_execute_script"
                 android:layout_marginBottom="20dp"
-                android:hint="Ducky Script"
+                android:hint="@string/hint_ducky_script"
                 android:textColor="@color/text_primary"
                 android:textColorHint="@color/text_hint"
                 android:gravity="top|start"
@@ -323,47 +329,41 @@
                 android:scrollbars="vertical" />
 
             <!-- Execute Script Button with Play Icon -->
-            <FrameLayout
+            <LinearLayout
                 android:id="@+id/btn_execute_script"
                 android:layout_width="match_parent"
                 android:layout_height="54dp"
                 android:layout_above="@+id/tv_script_status"
                 android:background="@drawable/button_primary"
+                android:orientation="horizontal"
+                android:gravity="center"
                 android:layout_marginBottom="8dp"
                 android:clickable="true"
                 android:focusable="true">
 
-                <LinearLayout
+                <ImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_play"
+                    app:tint="#FFFFFF"
+                    android:layout_marginEnd="8dp"
+                    android:contentDescription="@string/desc_execute_script" />
+
+                <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_gravity="center"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:src="@drawable/ic_play"
-                        app:tint="#FFFFFF"
-                        android:layout_marginEnd="8dp"
-                        android:contentDescription="Execute Script" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="EXECUTE SCRIPT"
-                        android:textColor="#FFFFFF"
-                        android:textSize="16sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-            </FrameLayout>
+                    android:text="@string/btn_execute_script"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/tv_script_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
-                android:text="Status: Ready"
+                android:text="@string/status_ready"
                 android:textColor="@color/text_secondary"
                 android:textSize="14sp" />
         </RelativeLayout>
@@ -382,14 +382,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingEnd="12dp"
+                android:paddingHorizontal="12dp"
                 android:clipToPadding="false">
 
                 <!-- Profile & Target Group -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="PROFILE &amp; TARGET"
+                    android:text="@string/profile_and_target"
                     android:textColor="@color/text_secondary"
                     android:textSize="11sp"
                     android:textStyle="bold"
@@ -412,23 +412,30 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Target OS"
+                            android:text="@string/target_os"
                             android:textColor="@color/text_primary"
                             android:textSize="16sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Adjusts gestures and Unicode strategies"
+                            android:text="@string/target_os_desc"
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp" />
                     </LinearLayout>
 
                     <Spinner
                         android:id="@+id/spinner_settings_os"
-                        android:layout_width="140dp"
-                        android:layout_height="48dp"
-                        android:background="@drawable/edit_text_background" />
+                        android:layout_width="120dp"
+                        android:layout_height="44dp"
+                        android:layout_marginStart="12dp"
+                        android:background="@drawable/spinner_background"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="0dp"
+                        android:spinnerMode="dropdown"
+                        android:overlapAnchor="false"
+                        android:dropDownVerticalOffset="4dp"
+                        android:dropDownHorizontalOffset="0dp" />
                 </LinearLayout>
 
                 <View
@@ -441,7 +448,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="MOUSE &amp; TRACKPAD"
+                    android:text="@string/mouse_and_trackpad"
                     android:textColor="@color/text_secondary"
                     android:textSize="11sp"
                     android:textStyle="bold"
@@ -462,7 +469,9 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Sensitivity"
+                            android:layout_alignParentStart="true"
+                            android:layout_toStartOf="@+id/tv_sensitivity_value"
+                            android:text="@string/sensitivity"
                             android:textColor="@color/text_primary"
                             android:textSize="16sp" />
 
@@ -471,7 +480,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
-                            android:text="3.0"
+                            android:text="@string/sensitivity_default"
                             android:textColor="@color/text_primary"
                             android:textSize="14sp" />
                     </RelativeLayout>
@@ -487,14 +496,14 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#1F2937"
+                    android:background="@color/border_normal"
                     android:layout_marginBottom="20dp" />
 
                 <!-- Keyboard Group -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="KEYBOARD"
+                    android:text="@string/section_keyboard"
                     android:textColor="@color/text_secondary"
                     android:textSize="11sp"
                     android:textStyle="bold"
@@ -517,68 +526,76 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Layout"
+                            android:text="@string/label_layout"
                             android:textColor="@color/text_primary"
                             android:textSize="16sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Multi-language mapping supported"
+                            android:text="@string/layout_desc"
                             android:textColor="@color/text_secondary"
                             android:textSize="12sp" />
                     </LinearLayout>
 
                     <Spinner
                         android:id="@+id/spinner_settings_layout"
-                        android:layout_width="160dp"
-                        android:layout_height="48dp"
-                        android:background="@drawable/edit_text_background" />
+                        android:layout_width="155dp"
+                        android:layout_height="44dp"
+                        android:layout_marginStart="12dp"
+                        android:background="@drawable/spinner_background"
+                        android:paddingStart="8dp"
+                        android:paddingEnd="0dp"
+                        android:spinnerMode="dropdown"
+                        android:overlapAnchor="false"
+                        android:dropDownVerticalOffset="4dp"
+                        android:dropDownHorizontalOffset="0dp" />
                 </LinearLayout>
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#1F2937"
+                    android:background="@color/border_normal"
                     android:layout_marginBottom="20dp" />
 
                 <!-- Bluetooth Visibility Group -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="BLUETOOTH VISIBILITY"
+                    android:text="@string/bluetooth_visibility"
                     android:textColor="@color/text_secondary"
                     android:textSize="11sp"
                     android:textStyle="bold"
                     android:layout_marginBottom="12dp"
                     android:letterSpacing="0.1" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_settings_discoverable"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:text="Make Discoverable"
+                    android:text="@string/make_discoverable"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:drawableStart="@drawable/ic_bluetooth"
-                    android:drawableTint="@color/text_primary"
+                    android:drawableTint="#FFFFFF"
                     android:drawablePadding="8dp"
                     android:paddingHorizontal="16dp"
-                    android:textColor="@color/text_primary"
-                    android:background="@drawable/button_secondary"
+                    android:textColor="#FFFFFF"
+                    android:background="@drawable/button_primary"
+                    app:backgroundTint="@null"
                     android:layout_marginBottom="24dp" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#1F2937"
+                    android:background="@color/border_normal"
                     android:layout_marginBottom="20dp" />
 
                 <!-- About Group -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ABOUT"
+                    android:text="@string/section_about"
                     android:textColor="@color/text_secondary"
                     android:textSize="11sp"
                     android:textStyle="bold"
@@ -593,32 +610,36 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Version"
+                        android:layout_alignParentStart="true"
+                        android:layout_toStartOf="@+id/tv_version_value"
+                        android:text="@string/label_version"
                         android:textColor="@color/text_primary"
                         android:textSize="16sp" />
 
                     <TextView
+                        android:id="@+id/tv_version_value"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:text="1.2.0 PRO (Unicode 17.0)"
+                        android:text="@string/version_value"
                         android:textColor="@color/text_secondary"
                         android:textSize="14sp" />
                 </RelativeLayout>
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/btn_settings_help"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:text="User Guide &amp; Reference"
+                    android:text="@string/user_guide_and_reference"
                     android:textSize="14sp"
                     android:textStyle="bold"
-                    android:drawableStart="@drawable/ic_shortcut_terminal"
-                    android:drawableTint="@color/text_primary"
+                    android:drawableStart="@drawable/ic_help"
+                    android:drawableTint="#FFFFFF"
                     android:drawablePadding="8dp"
                     android:paddingHorizontal="16dp"
-                    android:textColor="@color/text_primary"
-                    android:background="@drawable/button_secondary" />
+                    android:textColor="#FFFFFF"
+                    android:background="@drawable/button_primary"
+                    app:backgroundTint="@null" />
             </LinearLayout>
         </ScrollView>
     </FrameLayout>
@@ -627,14 +648,17 @@
     <LinearLayout
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
-        android:layout_height="88dp"
+        android:layout_height="80dp"
         android:layout_alignParentBottom="true"
-        android:background="@color/bg_card"
+        android:background="@android:color/transparent"
         android:orientation="horizontal"
         android:gravity="center_horizontal"
         android:layout_marginBottom="0dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="16dp">
+        android:paddingTop="6dp"
+        android:paddingBottom="12dp"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:baselineAligned="false">
         <!-- Shortcuts Tab -->
         <LinearLayout
             android:id="@+id/nav_shortcuts"
@@ -643,29 +667,31 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center_horizontal"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:clickable="true"
             android:focusable="true">
 
             <FrameLayout
                 android:id="@+id/container_shortcuts_pill"
-                android:layout_width="64dp"
-                android:layout_height="32dp"
-                android:layout_marginBottom="4dp">
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginBottom="2dp">
                 <ImageView
                     android:id="@+id/iv_nav_shortcuts"
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
                     android:src="@drawable/ic_shortcuts"
-                    app:tint="@color/text_primary"
+                    app:tint="@color/nav_selected_icon"
                     android:layout_gravity="center"
-                    android:contentDescription="Shortcuts" />
+                    android:contentDescription="@string/tab_shortcuts" />
             </FrameLayout>
 
             <TextView
                 android:id="@+id/tv_nav_shortcuts"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Shortcuts"
+                android:text="@string/tab_shortcuts"
                 android:textColor="@color/text_primary"
                 android:textSize="12sp"
                 android:textStyle="bold" />
@@ -679,29 +705,31 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center_horizontal"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:clickable="true"
             android:focusable="true">
 
             <FrameLayout
                 android:id="@+id/container_input_pill"
-                android:layout_width="64dp"
-                android:layout_height="32dp"
-                android:layout_marginBottom="4dp">
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginBottom="2dp">
                 <ImageView
                     android:id="@+id/iv_nav_input"
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
                     android:src="@drawable/mouse_24"
                     app:tint="@color/text_secondary"
                     android:layout_gravity="center"
-                    android:contentDescription="Input" />
+                    android:contentDescription="@string/tab_input" />
             </FrameLayout>
 
             <TextView
                 android:id="@+id/tv_nav_input"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Input"
+                android:text="@string/tab_input"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -714,29 +742,31 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center_horizontal"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:clickable="true"
             android:focusable="true">
 
             <FrameLayout
                 android:id="@+id/container_scripting_pill"
-                android:layout_width="64dp"
-                android:layout_height="32dp"
-                android:layout_marginBottom="4dp">
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginBottom="2dp">
                 <ImageView
                     android:id="@+id/iv_nav_scripting"
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
                     android:src="@drawable/ic_scripting"
                     app:tint="@color/text_secondary"
                     android:layout_gravity="center"
-                    android:contentDescription="Scripting" />
+                    android:contentDescription="@string/tab_scripting" />
             </FrameLayout>
 
             <TextView
                 android:id="@+id/tv_nav_scripting"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Scripting"
+                android:text="@string/tab_scripting"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -749,29 +779,31 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center_horizontal"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:clickable="true"
             android:focusable="true">
 
             <FrameLayout
                 android:id="@+id/container_settings_pill"
-                android:layout_width="64dp"
-                android:layout_height="32dp"
-                android:layout_marginBottom="4dp">
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginBottom="2dp">
                 <ImageView
                     android:id="@+id/iv_nav_settings"
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
                     android:src="@drawable/ic_settings"
                     app:tint="@color/text_secondary"
                     android:layout_gravity="center"
-                    android:contentDescription="Settings" />
+                    android:contentDescription="@string/tab_settings" />
             </FrameLayout>
 
             <TextView
                 android:id="@+id/tv_nav_settings"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Settings"
+                android:text="@string/tab_settings"
                 android:textColor="@color/text_secondary"
                 android:textSize="12sp" />
         </LinearLayout>

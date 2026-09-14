@@ -1,5 +1,94 @@
 <resources>
     <string name="app_name">HID Injector</string>
+    <string name="app_title">HID Control Center</string>
+
+    <!-- Navigation Tabs -->
+    <string name="tab_shortcuts">Shortcuts</string>
+    <string name="tab_input">Input</string>
+    <string name="tab_scripting">Scripting</string>
+    <string name="tab_settings">Settings</string>
+
+    <!-- Header & Status -->
+    <string name="toggle_theme">Toggle Theme</string>
+    <string name="refresh_link">Refresh Link</string>
+    <string name="select_device">Select device&#8230;</string>
+    <string name="status_on">ON</string>
+    <string name="status_off">OFF</string>
+    <string name="status_connected">CONNECTED</string>
+    <string name="status_connecting">CONNECTING</string>
+    <string name="status_ready">Status: Ready</string>
+    <string name="status_executing">Status: Executing&#8230;</string>
+    <string name="status_completed">Status: Completed</string>
+    <string name="status_error_format">Status: Error - %1$s</string>
+    <string name="command_exec_format">Command: %1$s</string>
+
+    <!-- Input Screen -->
+    <string name="trackpad">Trackpad</string>
+    <string name="btn_left">Left</string>
+    <string name="btn_middle">Middle</string>
+    <string name="btn_right">Right</string>
+    <string name="keyboard">Keyboard</string>
+    <string name="hint_realtime_keyboard">Type keys (real-time)&#8230;</string>
+
+    <!-- Scripting Screen -->
+    <string name="desc_script_library">Script Library</string>
+    <string name="desc_save_script">Save Script</string>
+    <string name="hint_ducky_script">Ducky Script</string>
+    <string name="desc_execute_script">Execute Script</string>
+    <string name="btn_execute_script">EXECUTE SCRIPT</string>
+
+    <!-- Settings Screen -->
+    <string name="profile_and_target">PROFILE &amp; TARGET</string>
+    <string name="target_os">Target OS</string>
+    <string name="target_os_desc">Adjusts gestures and Unicode strategies</string>
+    <string name="mouse_and_trackpad">MOUSE &amp; TRACKPAD</string>
+    <string name="sensitivity">Sensitivity</string>
+    <string name="sensitivity_default">3.0</string>
+    <string name="section_keyboard">KEYBOARD</string>
+    <string name="label_layout">Layout</string>
+    <string name="layout_desc">Multi-language mapping supported</string>
+    <string name="bluetooth_visibility">BLUETOOTH VISIBILITY</string>
+    <string name="make_discoverable">Make Discoverable</string>
+    <string name="section_about">ABOUT</string>
+    <string name="label_version">Version</string>
+    <string name="version_value">1.2.0 PRO (Unicode 17.0)</string>
+    <string name="user_guide_and_reference">User Guide &amp; Reference</string>
+
+    <!-- Dialogs & Shortcuts -->
+    <string name="dialog_title_shortcut_details">Shortcut Details</string>
+    <string name="desc_close_popup">Close Popup</string>
+    <string name="label_shortcut_name">Shortcut Name</string>
+    <string name="hint_shortcut_name">e.g. Open Command Prompt</string>
+    <string name="label_shortcut_icon">Shortcut Icon</string>
+    <string name="label_ducky_script_payload">Ducky Script Payload</string>
+    <string name="desc_save">Save</string>
+    <string name="hint_ducky_script_default">GUI r\nDELAY 500\nSTRING cmd\nENTER</string>
+    <string name="desc_add_to_home_screen">Add to Home Screen</string>
+    <string name="desc_delete">Delete</string>
+    <string name="desc_icon">Icon</string>
+    <string name="default_shortcut_name">Password</string>
+    <string name="desc_add_shortcut">Add Shortcut</string>
+
+    <string name="dialog_title_save_script">Save Script to Library</string>
+    <string name="hint_script_name">Enter script name</string>
+    <string name="btn_save">Save</string>
+    <string name="dialog_title_select_script">Select Script</string>
+    <string name="dialog_title_help">Ducky Script Reference</string>
+    <string name="btn_dismiss">Dismiss</string>
+    <string name="launcher_macro">Launcher Macro</string>
+    <string name="help_message">COMMANDS:\n\nSTRING &lt;text&gt;\n- Types the specified text onto host machine.\n\nDELAY &lt;ms&gt;\n- Pauses execution for specified milliseconds.\n\nENTER / TAB / SPACE / BACKSPACE\n- Presses those keys.\n\nGUI / WINDOWS &lt;key&gt;\n- Presses key combo (e.g. GUI r to run command prompt).\n\nCTRL / CONTROL &lt;key&gt;\n- Presses key with Control modifier.\n\nALT &lt;key&gt;\n- Presses key with Alt modifier.\n\nREM / //\n- Comments are ignored.</string>
+
+    <!-- Toasts -->
+    <string name="toast_no_device">No device connected. Please select a target device.</string>
+    <string name="toast_refreshing">Refreshing HID service &amp; device list&#8230;</string>
+    <string name="toast_bt_permission_required">Bluetooth permissions required.</string>
+    <string name="toast_executing">Executing: %1$s</string>
+    <string name="toast_pinned_success">Shortcut pinned to launcher home screen!</string>
+    <string name="toast_pinned_failure">Failed or unsupported by launcher.</string>
+    <string name="toast_save_success">Script saved successfully!</string>
+    <string name="toast_library_empty">Library is empty. Save some scripts first!</string>
+    <string name="toast_deleted">Deleted: %1$s</string>
+    <string name="toast_discoverable_failed">Failed to start discoverability request</string>
 
     <string-array name="target_os_array">
         <item>Windows</item>

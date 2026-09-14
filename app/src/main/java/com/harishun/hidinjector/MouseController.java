@@ -1,5 +1,6 @@
 package com.harishun.hidinjector;
 
+import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.MotionEvent;
@@ -33,6 +34,7 @@ public class MouseController {
         this.onDisconnected = onDisconnected;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     public void setupTrackpad(View trackpadView) {
         final int touchSlop = ViewConfiguration.get(trackpadView.getContext()).getScaledTouchSlop();
 

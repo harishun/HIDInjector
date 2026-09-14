@@ -1,5 +1,6 @@
 package com.harishun.hidinjector;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
@@ -57,6 +58,7 @@ public class ShortcutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (getItemViewType(position) == TYPE_ITEM) {
@@ -67,14 +69,18 @@ public class ShortcutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             GestureDetector detector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
                 @Override
-                public boolean onSingleTapConfirmed(MotionEvent e) {
-                    listener.onShortcutClick(item);
+                public boolean onDown(MotionEvent e) {
                     return true;
                 }
 
                 @Override
+                public boolean onSingleTapConfirmed(MotionEvent e) {
+                    listener.onShortcutClick(item);
+                    return true;
+                }
+                @Override
                 public void onLongPress(MotionEvent e) {
-                    listener.onStartDrag(holder);
+                    listener.onShortcutDoublePress(item);
                 }
 
                 @Override
@@ -85,8 +91,11 @@ public class ShortcutAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             });
 
             itemHolder.itemView.setOnTouchListener((v, event) -> {
-                detector.onTouchEvent(event);
-                return true;
+                boolean handled = detector.onTouchEvent(event);
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    v.performClick();
+                }
+                return handled;
             });
         } else {
             AddViewHolder addHolder = (AddViewHolder) holder;

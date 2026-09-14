@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@drawable/dialog_card_background"
+    tools:ignore="Overdraw">
+
+    <!-- Header Row -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp">
+
+        <TextView
+            android:id="@+id/dialog_tv_library_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_toStartOf="@+id/dialog_btn_close_library"
+            android:text="@string/dialog_title_select_script"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_centerVertical="true" />
+
+        <ImageView
+            android:id="@+id/dialog_btn_close_library"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_close"
+            app:tint="@color/status_red"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:padding="6dp"
+            android:contentDescription="@string/desc_close_popup"
+            android:clickable="true"
+            android:focusable="true" />
+    </RelativeLayout>
+
+    <ListView
+        android:id="@+id/lv_script_library"
+        android:layout_width="match_parent"
+        android:layout_height="260dp"
+        android:divider="@color/border_normal"
+        android:dividerHeight="0.5dp"
+        android:scrollbars="vertical" />
+
+</LinearLayout>

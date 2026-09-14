@@ -17,8 +17,25 @@ public class KeyboardInputHandler {
     }
 
     public void setupKeyboard(EditText editText) {
-        editText.setText(" ");
-        editText.setSelection(1);
+        editText.setText("");
+        editText.setHint(R.string.hint_realtime_keyboard);
+
+        editText.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                if (editText.getText().toString().isEmpty()) {
+                    isEditing = true;
+                    editText.setText(" ");
+                    editText.setSelection(1);
+                    isEditing = false;
+                }
+            } else {
+                if (" ".equals(editText.getText().toString())) {
+                    isEditing = true;
+                    editText.setText("");
+                    isEditing = false;
+                }
+            }
+        });
 
         editText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -45,13 +62,20 @@ public class KeyboardInputHandler {
                     hidKeyboard.sendText("\b");
                     editText.setText(" ");
                     editText.setSelection(1);
+                } else if (text.length() == 1) {
+                    char c = text.charAt(0);
+                    if (c != ' ') {
+                        hidKeyboard.sendText(String.valueOf(c));
+                        editText.setText(" ");
+                        editText.setSelection(1);
+                    }
                 } else if (text.length() == 2) {
                     char newChar = text.charAt(1);
                     hidKeyboard.sendText(String.valueOf(newChar));
                     editText.setText(" ");
                     editText.setSelection(1);
                 } else if (text.length() > 2) {
-                    String typed = text.substring(1);
+                    String typed = text.startsWith(" ") ? text.substring(1) : text;
                     hidKeyboard.sendText(typed);
                     editText.setText(" ");
                     editText.setSelection(1);

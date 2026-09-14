@@ -10,16 +10,22 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.OvershootInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -27,6 +33,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -76,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements
     private ItemTouchHelper itemTouchHelper;
     private long lastToastTime = 0;
     private int currentSelectedTab = 0;
+    private boolean isSpinnerProgrammaticChange = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +117,28 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (hasBluetoothPermissions()) {
+            if (hidKeyboard == null) {
+                startHidService();
+            } else if (!hidKeyboard.isServiceReady()) {
+                hidKeyboard.setupService();
+                refreshDeviceList();
+            } else {
+                refreshDeviceList();
+                if (hidKeyboard.isConnected()) {
+                    viewStatusDot.setBackgroundColor(ContextCompat.getColor(this, R.color.status_green));
+                    tvStatusOn.setText(R.string.status_connected);
+                    tvStatusOn.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
+                } else {
+                    autoConnectLastDevice();
+                }
+            }
+        }
+    }
+
+    @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt("saved_tab_index", currentSelectedTab);
@@ -117,7 +147,9 @@ public class MainActivity extends AppCompatActivity implements
     private void bindViews() {
         ImageView btnTheme = findViewById(R.id.btn_theme);
         if (btnTheme != null) {
-            btnTheme.setImageResource(settingsManager.isNightMode() ? R.drawable.light_mode_24 : R.drawable.dark_mode_24);
+            boolean isNight = settingsManager.isNightMode();
+            btnTheme.setImageResource(isNight ? R.drawable.light_mode_24 : R.drawable.dark_mode_24);
+            btnTheme.setColorFilter(isNight ? Color.parseColor("#FBBF24") : Color.WHITE);
             btnTheme.setOnClickListener(v -> toggleTheme());
         }
 
@@ -172,37 +204,85 @@ public class MainActivity extends AppCompatActivity implements
         navInput.setOnClickListener(v -> selectTab(1));
         navScripting.setOnClickListener(v -> selectTab(2));
         navSettings.setOnClickListener(v -> selectTab(3));
-        selectTab(currentSelectedTab);
+        int initialTab = currentSelectedTab;
+        currentSelectedTab = -1;
+        selectTab(initialTab);
     }
 
     private void selectTab(int index) {
+        boolean isInitial = (currentSelectedTab == -1);
         currentSelectedTab = index;
         screenShortcuts.setVisibility(index == 0 ? View.VISIBLE : View.GONE);
         screenInput.setVisibility(index == 1 ? View.VISIBLE : View.GONE);
         screenScripting.setVisibility(index == 2 ? View.VISIBLE : View.GONE);
         screenSettings.setVisibility(index == 3 ? View.VISIBLE : View.GONE);
 
-        pillShortcuts.setBackgroundResource(index == 0 ? R.drawable.bottom_nav_pill : 0);
-        pillInput.setBackgroundResource(index == 1 ? R.drawable.bottom_nav_pill : 0);
-        pillScripting.setBackgroundResource(index == 2 ? R.drawable.bottom_nav_pill : 0);
-        pillSettings.setBackgroundResource(index == 3 ? R.drawable.bottom_nav_pill : 0);
+        FrameLayout[] pills = new FrameLayout[]{pillShortcuts, pillInput, pillScripting, pillSettings};
+        TextView[] labels = new TextView[]{tvNavShortcuts, tvNavInput, tvNavScripting, tvNavSettings};
+        ImageView[] icons = new ImageView[]{ivNavShortcuts, ivNavInput, ivNavScripting, ivNavSettings};
 
-        int primaryColor = ContextCompat.getColor(this, R.color.text_primary);
-        int secondaryColor = ContextCompat.getColor(this, R.color.text_secondary);
+        int iconActiveColor = ContextCompat.getColor(this, R.color.nav_selected_icon);
+        int textActiveColor = ContextCompat.getColor(this, R.color.text_primary);
+        int inactiveColor = ContextCompat.getColor(this, R.color.text_secondary);
+        float floatUpDistance = -dpToPx(7);
 
-        tvNavShortcuts.setTextColor(index == 0 ? primaryColor : secondaryColor);
-        tvNavInput.setTextColor(index == 1 ? primaryColor : secondaryColor);
-        tvNavScripting.setTextColor(index == 2 ? primaryColor : secondaryColor);
-        tvNavSettings.setTextColor(index == 3 ? primaryColor : secondaryColor);
+        for (int i = 0; i < 4; i++) {
+            final FrameLayout pill = pills[i];
+            final TextView label = labels[i];
+            final ImageView icon = icons[i];
+            boolean isSelected = (i == index);
 
-        if (ivNavShortcuts != null) ivNavShortcuts.setColorFilter(index == 0 ? primaryColor : secondaryColor);
-        if (ivNavInput != null) ivNavInput.setColorFilter(index == 1 ? primaryColor : secondaryColor);
-        if (ivNavScripting != null) ivNavScripting.setColorFilter(index == 2 ? primaryColor : secondaryColor);
-        if (ivNavSettings != null) ivNavSettings.setColorFilter(index == 3 ? primaryColor : secondaryColor);
+            if (label != null) {
+                label.setTextColor(isSelected ? textActiveColor : inactiveColor);
+                label.setTypeface(null, isSelected ? Typeface.BOLD : Typeface.NORMAL);
+            }
+            if (icon != null) {
+                icon.setColorFilter(isSelected ? iconActiveColor : inactiveColor);
+            }
+
+            if (pill != null) {
+                if (isSelected) {
+                    pill.setBackgroundResource(R.drawable.bottom_nav_pill);
+                    if (!isInitial) {
+                        pill.animate()
+                                .translationY(floatUpDistance)
+                                .scaleX(1.15f)
+                                .scaleY(1.15f)
+                                .setDuration(220)
+                                .setInterpolator(new OvershootInterpolator(1.3f))
+                                .start();
+                    } else {
+                        pill.setTranslationY(floatUpDistance);
+                        pill.setScaleX(1.15f);
+                        pill.setScaleY(1.15f);
+                    }
+                } else {
+                    if (!isInitial) {
+                        pill.animate()
+                                .translationY(0f)
+                                .scaleX(1.0f)
+                                .scaleY(1.0f)
+                                .setDuration(180)
+                                .setInterpolator(new AccelerateDecelerateInterpolator())
+                                .withEndAction(() -> pill.setBackgroundResource(0))
+                                .start();
+                    } else {
+                        pill.setTranslationY(0f);
+                        pill.setScaleX(1.0f);
+                        pill.setScaleY(1.0f);
+                        pill.setBackgroundResource(0);
+                    }
+                }
+            }
+        }
 
         if (index == 1 && mouseController == null) setupInputScreenComponents();
         if (index == 2) setupScriptingScreenComponents();
         if (index == 3) setupSettingsScreenComponents();
+    }
+
+    private float dpToPx(float dp) {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
     }
 
     private boolean hasBluetoothPermissions() {
@@ -231,7 +311,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void refreshAllSystems() {
-        Toast.makeText(this, "Refreshing HID service & device list...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.toast_refreshing, Toast.LENGTH_SHORT).show();
         if (hidKeyboard != null) {
             hidKeyboard.cleanup();
         }
@@ -253,7 +333,7 @@ public class MainActivity extends AppCompatActivity implements
         if (requestCode == PERMISSION_REQUEST_CODE && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             startHidService();
         } else {
-            Toast.makeText(this, "Bluetooth permissions required.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.toast_bt_permission_required, Toast.LENGTH_LONG).show();
         }
     }
 
@@ -261,7 +341,7 @@ public class MainActivity extends AppCompatActivity implements
         runOnUiThread(() -> {
             long now = System.currentTimeMillis();
             if (now - lastToastTime > 3000) {
-                Toast.makeText(this, "No device connected. Please select a target device.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.toast_no_device, Toast.LENGTH_SHORT).show();
                 lastToastTime = now;
             }
         });
@@ -279,7 +359,7 @@ public class MainActivity extends AppCompatActivity implements
         if (hidKeyboard == null) return;
         pairedDevices = hidKeyboard.getPairedDevices();
         List<String> names = new ArrayList<>();
-        names.add("Select device...");
+        names.add(getString(R.string.select_device));
 
         String lastAddress = settingsManager.getLastConnectedDeviceAddress();
         int autoConnectPosition = -1;
@@ -295,24 +375,49 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, names);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.item_spinner_dropdown, R.id.tv_dropdown_text, names) {
+            @NonNull
+            @Override
+            public View getDropDownView(int position, View convertView, @NonNull ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                ImageView icon = view.findViewById(R.id.iv_dropdown_icon);
+                if (icon != null) {
+                    icon.setVisibility(position == 0 ? View.GONE : View.VISIBLE);
+                }
+                return view;
+            }
+        };
+        isSpinnerProgrammaticChange = true;
         spinnerDevices.setAdapter(adapter);
+        spinnerDevices.setPopupBackgroundResource(R.drawable.dialog_card_background);
+        spinnerDevices.post(() -> {
+            int w = spinnerDevices.getWidth();
+            if (w > 0) {
+                spinnerDevices.setDropDownWidth(w);
+                spinnerDevices.setDropDownHorizontalOffset(-spinnerDevices.getPaddingLeft());
+            }
+            isSpinnerProgrammaticChange = false;
+        });
 
         if (autoConnectPosition != -1) {
             spinnerDevices.setSelection(autoConnectPosition);
-            if (hidKeyboard != null && !hidKeyboard.isConnected()) {
-                BluetoothDevice autoDevice = pairedDevices.get(autoConnectPosition - 1);
-                hidKeyboard.connectToDevice(autoDevice);
-            }
         }
 
         spinnerDevices.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                if (position > 0 && position <= pairedDevices.size()) {
+                if (isSpinnerProgrammaticChange) {
+                    return;
+                }
+                if (position == 0) {
+                    if (hidKeyboard != null) {
+                        hidKeyboard.disconnect();
+                    }
+                } else if (position > 0 && position <= pairedDevices.size()) {
                     BluetoothDevice selected = pairedDevices.get(position - 1);
-                    hidKeyboard.connectToDevice(selected);
+                    if (hidKeyboard != null) {
+                        hidKeyboard.connectToDevice(selected);
+                    }
                 }
             }
             @Override
@@ -332,7 +437,7 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 if (target.getItemViewType() == 1) return false;
-                shortcutAdapter.onItemMove(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                shortcutAdapter.onItemMove(viewHolder.getBindingAdapterPosition(), target.getBindingAdapterPosition());
                 return true;
             }
             @Override
@@ -347,7 +452,7 @@ public class MainActivity extends AppCompatActivity implements
     public void onShortcutClick(ShortcutItem item) {
         if (!checkConnectionOrWarn()) return;
         if (duckyInterpreter != null) {
-            Toast.makeText(this, "Executing: " + item.name, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.toast_executing, item.name), Toast.LENGTH_SHORT).show();
             duckyInterpreter.execute(item.script, null);
         }
     }
@@ -369,6 +474,7 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void setupInputScreenComponents() {
         if (hidKeyboard == null) return;
         mouseController = new MouseController(hidKeyboard, settingsManager, this::showConnectionToast);
@@ -415,25 +521,25 @@ public class MainActivity extends AppCompatActivity implements
             String script = etScript.getText().toString();
             if (script.isEmpty()) return;
             executeBtn.setEnabled(false);
-            tvStatus.setText("Status: Executing...");
+            tvStatus.setText(R.string.status_executing);
             duckyInterpreter.execute(script, new DuckyInterpreter.InterpreterListener() {
                 @Override
                 public void onScriptFinished() {
                     runOnUiThread(() -> {
                         executeBtn.setEnabled(true);
-                        tvStatus.setText("Status: Completed");
+                        tvStatus.setText(R.string.status_completed);
                     });
                 }
                 @Override
                 public void onScriptError(String error) {
                     runOnUiThread(() -> {
                         executeBtn.setEnabled(true);
-                        tvStatus.setText("Status: Error - " + error);
+                        tvStatus.setText(getString(R.string.status_error_format, error));
                     });
                 }
                 @Override
                 public void onCommandExecuted(String cmd) {
-                    runOnUiThread(() -> tvStatus.setText("Command: " + cmd));
+                    runOnUiThread(() -> tvStatus.setText(getString(R.string.command_exec_format, cmd)));
                 }
             });
         });
@@ -455,9 +561,17 @@ public class MainActivity extends AppCompatActivity implements
         Button discoverableBtn = findViewById(R.id.btn_settings_discoverable);
 
         ArrayAdapter<CharSequence> osAdapter = ArrayAdapter.createFromResource(this,
-                R.array.target_os_array, android.R.layout.simple_spinner_item);
-        osAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                R.array.target_os_array, R.layout.item_spinner_text);
+        osAdapter.setDropDownViewResource(R.layout.item_spinner_text_dropdown);
         osSpinner.setAdapter(osAdapter);
+        osSpinner.setPopupBackgroundResource(R.drawable.dialog_card_background);
+        osSpinner.post(() -> {
+            int w = osSpinner.getWidth();
+            if (w > 0) {
+                osSpinner.setDropDownWidth(w);
+                osSpinner.setDropDownHorizontalOffset(-osSpinner.getPaddingLeft());
+            }
+        });
         osSpinner.setSelection(getTargetOSIndex(settingsManager.getTargetOS()));
         osSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -469,9 +583,17 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         ArrayAdapter<CharSequence> layoutAdapter = ArrayAdapter.createFromResource(this,
-                R.array.keyboard_layouts_array, android.R.layout.simple_spinner_item);
-        layoutAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                R.array.keyboard_layouts_array, R.layout.item_spinner_text);
+        layoutAdapter.setDropDownViewResource(R.layout.item_spinner_text_dropdown);
         layoutSpinner.setAdapter(layoutAdapter);
+        layoutSpinner.setPopupBackgroundResource(R.drawable.dialog_card_background);
+        layoutSpinner.post(() -> {
+            int w = layoutSpinner.getWidth();
+            if (w > 0) {
+                layoutSpinner.setDropDownWidth(w);
+                layoutSpinner.setDropDownHorizontalOffset(-layoutSpinner.getPaddingLeft());
+            }
+        });
         layoutSpinner.setSelection(getLayoutIndex(settingsManager.getKeyboardLayout()));
         layoutSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -510,7 +632,7 @@ public class MainActivity extends AppCompatActivity implements
                 discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
                 startActivity(discoverableIntent);
             } catch (Exception e) {
-                Toast.makeText(this, "Failed to start discoverability request", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.toast_discoverable_failed, Toast.LENGTH_SHORT).show();
             }
         } else {
             requestBluetoothPermissions();
@@ -545,6 +667,7 @@ public class MainActivity extends AppCompatActivity implements
     private void applyBlurAndDimToDialog(AlertDialog dialog) {
         if (dialog != null && dialog.getWindow() != null) {
             Window window = dialog.getWindow();
+            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             window.setDimAmount(0.65f);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 window.addFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
@@ -631,7 +754,7 @@ public class MainActivity extends AppCompatActivity implements
 
         pinBtn.setOnClickListener(v -> {
             boolean success = shortcutHelper.pinShortcutToHomeScreen(item);
-            Toast.makeText(this, success ? "Shortcut pinned to launcher home screen!" : "Failed or unsupported by launcher.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, success ? getString(R.string.toast_pinned_success) : getString(R.string.toast_pinned_failure), Toast.LENGTH_SHORT).show();
             dialog.dismiss();
         });
 
@@ -657,6 +780,14 @@ public class MainActivity extends AppCompatActivity implements
         options.add(new IconOption("Key", "key", R.drawable.ic_shortcut_key));
         options.add(new IconOption("Web", "web", R.drawable.ic_shortcut_web));
         options.add(new IconOption("Keyboard", "keyboard", R.drawable.ic_shortcut_keyboard));
+        options.add(new IconOption("Rocket", "rocket", R.drawable.ic_shortcut_rocket));
+        options.add(new IconOption("Folder", "folder", R.drawable.ic_shortcut_folder));
+        options.add(new IconOption("Shield", "shield", R.drawable.ic_shortcut_shield));
+        options.add(new IconOption("Power", "power", R.drawable.ic_shortcut_power));
+        options.add(new IconOption("Media", "media", R.drawable.ic_shortcut_media));
+        options.add(new IconOption("Clipboard", "clipboard", R.drawable.ic_shortcut_clipboard));
+        options.add(new IconOption("Laptop", "laptop", R.drawable.ic_shortcut_laptop));
+        options.add(new IconOption("Code", "code", R.drawable.ic_shortcut_code));
 
         ArrayAdapter<IconOption> adapter = new ArrayAdapter<IconOption>(this, R.layout.item_icon_spinner, options) {
             @NonNull
@@ -687,6 +818,14 @@ public class MainActivity extends AppCompatActivity implements
         };
 
         spinner.setAdapter(adapter);
+        spinner.setPopupBackgroundResource(R.drawable.dialog_card_background);
+        spinner.post(() -> {
+            int w = spinner.getWidth();
+            if (w > 0) {
+                spinner.setDropDownWidth(w);
+                spinner.setDropDownHorizontalOffset(-spinner.getPaddingLeft());
+            }
+        });
 
         int selectIdx = 0;
         for (int i = 0; i < options.size(); i++) {
@@ -700,23 +839,25 @@ public class MainActivity extends AppCompatActivity implements
 
     private void showSaveScriptDialog(String script) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Save Script to Library");
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_save_script, null);
+        EditText etName = view.findViewById(R.id.dialog_et_script_save_name);
+        ImageView closeBtn = view.findViewById(R.id.dialog_btn_close_save);
+        Button saveBtn = view.findViewById(R.id.dialog_btn_confirm_save_script);
 
-        EditText etName = new EditText(this);
-        etName.setHint("Enter script name");
-        etName.setPadding(32, 32, 32, 32);
-        builder.setView(etName);
+        builder.setView(view);
+        AlertDialog dialog = builder.create();
 
-        builder.setPositiveButton("Save", (dialog, which) -> {
+        closeBtn.setOnClickListener(v -> dialog.dismiss());
+        saveBtn.setOnClickListener(v -> {
             String name = etName.getText().toString().trim();
             if (!name.isEmpty()) {
                 SharedPreferences libPrefs = getSharedPreferences("script_library", MODE_PRIVATE);
                 libPrefs.edit().putString(name, script).apply();
-                Toast.makeText(this, "Script saved successfully!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.toast_save_success, Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
             }
         });
-        builder.setNegativeButton("Cancel", null);
-        AlertDialog dialog = builder.create();
+
         applyBlurAndDimToDialog(dialog);
         dialog.show();
     }
@@ -727,37 +868,78 @@ public class MainActivity extends AppCompatActivity implements
         List<String> names = new ArrayList<>(all.keySet());
 
         if (names.isEmpty()) {
-            Toast.makeText(this, "Library is empty. Save some scripts first!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.toast_library_empty, Toast.LENGTH_SHORT).show();
             return;
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Select Script");
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_select_script, null);
+        ImageView closeBtn = view.findViewById(R.id.dialog_btn_close_library);
+        ListView listView = view.findViewById(R.id.lv_script_library);
 
-        String[] nameArray = names.toArray(new String[0]);
-        builder.setItems(nameArray, (dialog, which) -> {
-            String name = nameArray[which];
-            String script = libPrefs.getString(name, "");
-            editor.setText(script);
-        });
+        builder.setView(view);
         AlertDialog dialog = builder.create();
+
+        closeBtn.setOnClickListener(v -> dialog.dismiss());
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.item_script_library, names) {
+            @NonNull
+            @Override
+            public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+                View row = convertView;
+                if (row == null) {
+                    row = LayoutInflater.from(getContext()).inflate(R.layout.item_script_library, parent, false);
+                }
+                String name = getItem(position);
+                TextView tvName = row.findViewById(R.id.tv_script_library_name);
+                ImageView btnDelete = row.findViewById(R.id.btn_delete_library_script);
+
+                if (name != null) {
+                    tvName.setText(name);
+                }
+
+                row.setOnClickListener(v -> {
+                    if (name != null) {
+                        String script = libPrefs.getString(name, "");
+                        editor.setText(script);
+                    }
+                    dialog.dismiss();
+                });
+
+                btnDelete.setOnClickListener(v -> {
+                    if (name != null) {
+                        libPrefs.edit().remove(name).apply();
+                        remove(name);
+                        notifyDataSetChanged();
+                        Toast.makeText(MainActivity.this, getString(R.string.toast_deleted, name), Toast.LENGTH_SHORT).show();
+                        if (isEmpty()) {
+                            dialog.dismiss();
+                            Toast.makeText(MainActivity.this, R.string.toast_library_empty, Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+
+                return row;
+            }
+        };
+
+        listView.setAdapter(adapter);
         applyBlurAndDimToDialog(dialog);
         dialog.show();
     }
 
     private void showHelpDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Ducky Script Reference");
-        builder.setMessage("COMMANDS:\n\n" +
-                "STRING <text>\n- Types the specified text onto host machine.\n\n" +
-                "DELAY <ms>\n- Pauses execution for specified milliseconds.\n\n" +
-                "ENTER / TAB / SPACE / BACKSPACE\n- Presses those keys.\n\n" +
-                "GUI / WINDOWS <key>\n- Presses key combo (e.g. GUI r to run command prompt).\n\n" +
-                "CTRL / CONTROL <key>\n- Presses key with Control modifier.\n\n" +
-                "ALT <key>\n- Presses key with Alt modifier.\n\n" +
-                "REM / //\n- Comments are ignored.");
-        builder.setPositiveButton("Dismiss", null);
+        View view = LayoutInflater.from(this).inflate(R.layout.dialog_help, null);
+        ImageView closeBtn = view.findViewById(R.id.dialog_btn_close_help);
+        Button dismissBtn = view.findViewById(R.id.dialog_btn_dismiss_help);
+
+        builder.setView(view);
         AlertDialog dialog = builder.create();
+
+        closeBtn.setOnClickListener(v -> dialog.dismiss());
+        dismissBtn.setOnClickListener(v -> dialog.dismiss());
+
         applyBlurAndDimToDialog(dialog);
         dialog.show();
     }
@@ -777,10 +959,23 @@ public class MainActivity extends AppCompatActivity implements
             if (script != null) {
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     if (checkConnectionOrWarn() && duckyInterpreter != null) {
-                        Toast.makeText(this, "Executing: " + (name != null ? name : "Launcher Macro"), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.toast_executing, (name != null ? name : getString(R.string.launcher_macro))), Toast.LENGTH_SHORT).show();
                         duckyInterpreter.execute(script, null);
                     }
                 }, 1000);
+            }
+        }
+    }
+
+    private void autoConnectLastDevice() {
+        if (hidKeyboard == null || hidKeyboard.isConnected() || !hidKeyboard.isServiceReady()) return;
+        String lastAddress = settingsManager.getLastConnectedDeviceAddress();
+        if (lastAddress == null) return;
+
+        for (BluetoothDevice dev : pairedDevices) {
+            if (dev.getAddress().equalsIgnoreCase(lastAddress)) {
+                hidKeyboard.connectToDevice(dev);
+                break;
             }
         }
     }
@@ -789,11 +984,18 @@ public class MainActivity extends AppCompatActivity implements
     public void onRegistrationStatusChanged(boolean isRegistered) {
         runOnUiThread(() -> {
             if (isRegistered) {
-                tvStatusOn.setText("ON");
-                tvStatusOn.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
-                viewStatusDot.setBackgroundColor(ContextCompat.getColor(this, R.color.status_green));
+                if (hidKeyboard != null && hidKeyboard.isConnected()) {
+                    tvStatusOn.setText(R.string.status_connected);
+                    tvStatusOn.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
+                    viewStatusDot.setBackgroundColor(ContextCompat.getColor(this, R.color.status_green));
+                } else {
+                    tvStatusOn.setText(R.string.status_on);
+                    tvStatusOn.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
+                    viewStatusDot.setBackgroundColor(ContextCompat.getColor(this, R.color.status_green));
+                    autoConnectLastDevice();
+                }
             } else {
-                tvStatusOn.setText("OFF");
+                tvStatusOn.setText(R.string.status_off);
                 tvStatusOn.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
                 viewStatusDot.setBackgroundColor(ContextCompat.getColor(this, R.color.status_red));
             }
@@ -808,13 +1010,40 @@ public class MainActivity extends AppCompatActivity implements
         runOnUiThread(() -> {
             if (state == BluetoothProfile.STATE_CONNECTED) {
                 viewStatusDot.setBackgroundColor(ContextCompat.getColor(this, R.color.status_green));
-                tvStatusOn.setText("CONNECTED");
+                tvStatusOn.setText(R.string.status_connected);
+                tvStatusOn.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
+
+                if (device != null && spinnerDevices != null) {
+                    isSpinnerProgrammaticChange = true;
+                    for (int i = 0; i < pairedDevices.size(); i++) {
+                        if (pairedDevices.get(i).getAddress().equalsIgnoreCase(device.getAddress())) {
+                            spinnerDevices.setSelection(i + 1);
+                            break;
+                        }
+                    }
+                    isSpinnerProgrammaticChange = false;
+                }
             } else if (state == BluetoothProfile.STATE_CONNECTING) {
                 viewStatusDot.setBackgroundColor(ContextCompat.getColor(this, R.color.status_yellow));
-                tvStatusOn.setText("CONNECTING");
+                tvStatusOn.setText(R.string.status_connecting);
+                tvStatusOn.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
             } else {
-                viewStatusDot.setBackgroundColor(ContextCompat.getColor(this, R.color.status_red));
-                tvStatusOn.setText("ON");
+                // STATE_DISCONNECTED: Service remains ON and ready, waiting for device selection
+                if (hidKeyboard != null && hidKeyboard.isServiceReady()) {
+                    viewStatusDot.setBackgroundColor(ContextCompat.getColor(this, R.color.status_green));
+                    tvStatusOn.setText(R.string.status_on);
+                    tvStatusOn.setTextColor(ContextCompat.getColor(this, R.color.text_primary));
+                } else {
+                    viewStatusDot.setBackgroundColor(ContextCompat.getColor(this, R.color.status_red));
+                    tvStatusOn.setText(R.string.status_off);
+                    tvStatusOn.setTextColor(ContextCompat.getColor(this, R.color.text_secondary));
+                }
+
+                if (spinnerDevices != null) {
+                    isSpinnerProgrammaticChange = true;
+                    spinnerDevices.setSelection(0);
+                    isSpinnerProgrammaticChange = false;
+                }
             }
         });
     }

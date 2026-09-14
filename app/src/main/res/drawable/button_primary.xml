@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
-    android:color="#40FFFFFF">
+    android:color="#40C084FC">
     <item>
         <shape android:shape="rectangle">
             <gradient
-                android:startColor="@color/btn_grape_primary"
-                android:endColor="@color/btn_grape_dark"
+                android:startColor="@color/btn_bg_start"
+                android:endColor="@color/btn_bg_end"
                 android:angle="45" />
-            <corners android:radius="12dp" />
+            <stroke
+                android:width="1.5dp"
+                android:color="@color/btn_border_stroke" />
+            <corners android:radius="14dp" />
         </shape>
     </item>
 </ripple>
